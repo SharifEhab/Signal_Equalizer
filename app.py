@@ -1,8 +1,9 @@
 import streamlit as st
 import Equalizer_Functions
 
-
 st.set_page_config(page_title="Equalizer", page_icon="✅", layout="wide")
+with open("style.css") as design:
+    st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
 
 #________________________SESSION STATE INITIALIZATIONS_________________________#
 if 'Spectogram_Graph' not in st.session_state:
@@ -27,22 +28,27 @@ if file:
             st.session_state['Spectogram_Graph'] = False
 
         if Mode == 'Uniform Range':
-            dictnoary_values = {"0:1000": [0, 1000],
-                                    "1000:2000": [1000, 2000],
-                                    "3000:4000": [3000, 4000],
-                                    "4000:5000": [4000, 5000],
-                                    "5000:6000": [5000, 6000],
-                                    "6000:7000": [6000, 7000],
-                                    "7000:8000": [7000, 8000],
-                                    "8000:9000": [8000, 9000],
-                                    "9000:10000": [9000, 10000]
-                                }
-            values_slider = [[0, 10, 1]]*len(list(dictnoary_values.keys()))
+            dict_values = [
+                ("0:1000", [0, 1000]),
+                ("1000:2000", [1000, 2000]),
+                ("3000:4000", [3000, 4000]),
+                ("4000:5000", [4000, 5000]),
+                ("5000:6000", [5000, 6000]),
+                ("6000:7000", [6000, 7000]),
+                ("7000:8000", [7000, 8000]),
+                ("8000:9000", [8000, 9000]),
+                ("9000:10000", [9000, 10000])
+            ]
+            values_slider = [[0, 10, 1]]*len(dict_values)
+            slider_values = Equalizer_Functions.generate_slider(dict_values, values_slider)
+
         elif Mode == 'Vowels':
-            dictnoary_values = {"E": [800, 1500],
-                                "T": [700, 1800],
-                                "A": [1000, 2500],
-                                "O": [500, 2000]
-                                }
-            values_slider = [[0, 10, 1]]*len(list(dictnoary_values.keys())) 
+            dict_values = [
+                ("E",[800, 1500]),
+                ("T",[700, 1800]),
+                ("A",[1000, 2500]),
+                ("O",[500, 2000])
+            ]
+            values_slider = [[0, 10, 1]]*len(dict_values)
+
         
