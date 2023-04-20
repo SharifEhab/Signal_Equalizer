@@ -2,6 +2,8 @@ import  streamlit_vertical_slider  as svs
 from Signal_Generation_class import Signal
 import numpy as np
 import pandas as pd
+import librosa
+import librosa.display
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -72,4 +74,25 @@ def generate_slider(dict_values, values_slider):
         slider_values.append(slider_val)
     return slider_values
 
+
+def load_audio_file(path_file_upload):
+    
+    """
+    Function to upload audio file given file path using librosa
+    
+    (Librosa is a Python package for analyzing and working with audio files,
+    and it can handle a variety of audio file formats, including WAV, MP3, FLAC, OGG, 
+    and many more.)
+    
+    Parameters:
+    Audio file path
+    
+    Output:
+    Audio samples
+    Sampling rate
+    """
+    if path_file_upload is not None:
+        audio_samples,sampling_rate=librosa.load(path_file_upload)
+        
+    return audio_samples,sampling_rate    
 
