@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import librosa
 import librosa.display
+from numpy.fft import fft,rfft,rfftfreq,irfft,fftfreq
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -96,3 +97,62 @@ def load_audio_file(path_file_upload):
         
     return audio_samples,sampling_rate    
 
+def Fourier_Transform_explicit(amplitude_signal,sampling_rate):
+    """
+    Nyquist rate = 2fmax
+    Nyquist_freq = 1/2*sampling_freq
+    
+    FFT--->Output complex array that corresponds to the fourier transformed signal
+    It symmetric about the nyquist frequency , so we take the magnitude of the positive 
+    part and multiply it by 2 except for the DC component
+    and the nyquist frequency (To accomodate for the negative part)
+    """
+    number_of_samples = len(amplitude_signal)
+    
+    Sampling_period = 1/sampling_rate
+    
+    
+    fft_result = fft(amplitude_signal,number_of_samples) # Compute the one-dimensional DFT using FFT Algorithm.
+    
+    magnitude_frequency_components = np.abs(fft_result) #Gets the magnitude of frequency components
+    
+    positive_frequencies = magnitude_frequency_components[:number_of_samples//2 +1]  #  Take positive part only
+     
+    positive_frequencies[1:-1] *=2  #Multiply magnitude by two except for DC component and Nyquist frequency
+      
+    frequency_components = fftfreq (number_of_samples,Sampling_period)[:number_of_samples//2 +1]   #Get corresponding frequencies of the magnitude of the FFT
+    
+    return magnitude_frequency_components, frequency_components
+
+
+def Fourier_Transform_Signal(amplitude_signal, sampling_rate):
+    """
+    rrft-->  specialized version of the FFT algorithm that is 
+    optimized for real-valued signals,  returns only positive frequencies
+    
+    rfftfreq--> function from the NumPy library is used to compute the frequencies 
+    directly from the signal, returns an array of frequencies corresponding to the 
+    output of the rfft function. 
+    """
+    number_of_samples = len(amplitude_signal)
+    
+    sampling_period = 1/sampling_rate
+    
+    magnitude_freq_components = rfft(amplitude_signal)
+    
+    frequency_components = rfftfreq(number_of_samples,sampling_period)
+    
+    return magnitude_freq_components,frequency_components
+
+def Inverse_Fourier_Transform(Magnitude_frequency_components):
+    """
+    Function to apply inverse fourier transform to transform the signal back to the time 
+    domain
+    
+    After modifying the magnitude of the signal of some frequency components
+    we apply the irfft to get the modified signal in the time domain (reconstruction)
+    """
+    
+    Amplitude_time_domain = irfft(Magnitude_frequency_components) #Transform the signal back to the time domain.
+    
+    return np.real(Amplitude_time_domain)  #ensure the output is real.
