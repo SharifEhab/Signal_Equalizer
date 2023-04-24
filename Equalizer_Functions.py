@@ -5,6 +5,7 @@ import pandas as pd
 import librosa
 import librosa.display
 from numpy.fft import fft,rfft,rfftfreq,irfft,fftfreq
+import streamlit as st
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -68,12 +69,33 @@ def SignalListClean():
 
 
 
-def generate_slider(dict_values, values_slider):
-    slider_values = []
-    for i, (label, value_range) in enumerate(dict_values):
-        slider_val = svs.vertical_slider(key=f"slider_{i}",min_value=value_range[0], max_value=value_range[1], step=values_slider[i][2])
-        slider_values.append(slider_val)
-    return slider_values
+def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step):
+    """
+    Generate vertical sliders for different equalizer modes
+    Parameters
+    ----------
+    Slider_labels : label for each slider that controls the magnitude of certain frequency 
+    ranges for the different modes 
+    
+    Slider_values: factor that would be multiplied with the magnitude of some frequency 
+    components
+    
+    Slider_step: step of increment/decrement for each slider
+   
+    Return : different_slider_values : has (Start,end,step) for all sliders in the selected mode
+    
+    """
+    different_slider_values = []
+    slider_columns = st.columns(len(array_slider_labels))
+    for col_number in range(len(array_slider_labels)) :
+        with slider_columns[col_number] :
+            current_slider = array_slider_values[col_number]
+            slider = svs.vertical_slider(key=array_slider_labels[col_number],min_value=current_slider[0],max_value=current_slider[1],
+                                         default_value=current_slider[2],step=Slider_step)
+            different_slider_values.append(slider)
+            st.write(array_slider_labels[col_number]) 
+            
+    return different_slider_values         
 
 
 def load_audio_file(path_file_upload):
