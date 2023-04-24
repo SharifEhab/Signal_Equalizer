@@ -28,27 +28,26 @@ if file:
             st.session_state['Spectogram_Graph'] = False
 
         if Mode == 'Uniform Range':
-            dict_values = [
-                ("0:1000", [0, 1000]),
-                ("1000:2000", [1000, 2000]),
-                ("3000:4000", [3000, 4000]),
-                ("4000:5000", [4000, 5000]),
-                ("5000:6000", [5000, 6000]),
-                ("6000:7000", [6000, 7000]),
-                ("7000:8000", [7000, 8000]),
-                ("8000:9000", [8000, 9000]),
-                ("9000:10000", [9000, 10000])
-            ]
-            values_slider = [[0, 10, 1]]*len(dict_values)
-            slider_values = Equalizer_Functions.generate_slider(dict_values, values_slider)
+            dict_values = {"0:1000": [0, 1000],
+                                    "1000:2000": [1000, 2000],
+                                    "3000:4000": [3000, 4000],
+                                    "4000:5000": [4000, 5000],
+                                    "5000:6000": [5000, 6000],
+                                    "6000:7000": [6000, 7000],
+                                    "7000:8000": [7000, 8000],
+                                    "8000:9000": [8000, 9000],
+                                    "9000:10000": [9000, 10000]
+                                    }
+            values_slider = [[0, 10, 1]]*len(list(dict_values.keys()))
+            slider_values = Equalizer_Functions.generate_vertical_sliders(list(dict_values.keys()), values_slider)
 
         elif Mode == 'Vowels':
-            dict_values = [
-                ("E",[800, 1500]),
-                ("T",[700, 1800]),
-                ("A",[1000, 2500]),
-                ("O",[500, 2000])
-            ]
+            dict_values = {
+                "E":[800, 1500],
+                "T":[700, 1800],
+                "A":[1000, 2500],
+                "O":[500, 2000]
+            }
             values_slider = [[0, 10, 1]]*len(dict_values)
 
         

@@ -69,7 +69,7 @@ def SignalListClean():
 
 
 
-def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step):
+def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
     """
     Generate vertical sliders for different equalizer modes
     Parameters
