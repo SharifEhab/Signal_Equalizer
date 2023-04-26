@@ -9,6 +9,10 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
 import soundfile as soundf
+import matplotlib.pyplot as plt
+import time
+import altair as alt
+
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -316,19 +320,17 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         
         modified_audio(magnitude_time_modified,sampling_rate)  
         
-     #   with col_timeplot_before:
+        with col_timeplot_before:
           
-       #   show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
-      #  if bool_spectrogram ==1:
-      #     with col_spectro_before:
-     #          st.pyplot(spectrogram(magnitude_signal_time,"Before")) 
-            
-    #        with col_spectro_after:
-   #             st.pyplot(spectrogram(magnitude_time_modified,"After"))
+             show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
+        if bool_spectrogram ==1:
+            with col_spectro_before:
+               st.pyplot(spectogram(magnitude_signal_time,"Before")) 
+            with col_spectro_after:
+               st.pyplot(spectogram(magnitude_time_modified,"After"))
                 
-                
+#____________________________________Audio After______________________________________#
 def modified_audio(magnitude_time_modified,sample_rate) :
-    
     """
     Function to display audio after modifications
      Parameters
@@ -342,5 +344,169 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     st.sidebar.write("#Audio after")
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
+
+#______________________________ Animation Function_____________________________________#
+
+def plot_animation(df):
+    """
+        Function to make the signal animated
+
+        Parameters
+        ----------
+        df  : dataframe to be animated
+
+        Return
+        ----------
+        figure             
+    """ 
+    brush = alt.selection_interval()
+    chart1 = alt.Chart(df).mark_line().encode(
+        x=alt.X('time', axis=alt.Axis(title='Time')),
+    ).properties(
+        width=400,
+        height=200
+    ).add_selection(
+        brush).interactive()
+
+    figure = chart1.encode(
+        y=alt.Y('amplitude', axis=alt.Axis(title='Amplitude'))) | chart1.encode(
+        y=alt.Y('amplitude after processing', axis=alt.Axis(title='Amplitude after'))).add_selection(
+        brush)
+    return figure
+
     
+#______________________________Plot Functions_________________________________#
+
+def currentState(df, size, num_of_element):
+    """
+    Function to display current state of dataframe
+
+    Parameters
+    ----------
+    df            : Pandas dataframe
+    size          : size of the dataframe
+    num_of_element: number of elements to be displayed
+
+    Return
+    ----------
+    chart         : chart of current state
+    """
+
+    if 'i' not in st.session_state:
+        st.session_state.i = 0
+
+    if st.session_state.i == 0:
+        step_df = df.iloc[0:num_of_element]
+    else:
+        step_df = df.iloc[st.session_state.i: st.session_state.i + num_of_element]
+
+    lines = plot_animation(step_df)
+    line_plot = st.altair_chart(lines)
+
+    if st.session_state.i + num_of_element < size:
+        if st.button('Next'):
+            st.session_state.i += num_of_element
+    else:
+        st.session_state.i = 0
+
+    return line_plot
+
+
+def plotRep(df, size, start, num_of_element, line_plot):
+    if 'current_state' not in st.session_state:
+        st.session_state.current_state = start
+    if 'step_df' not in st.session_state:
+        st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
+    play_button = st.button('Play')
+    pause_button = st.button('Pause')
+    speed = st.slider('Speed', min_value=1, max_value=10, value=5)
+    if play_button:
+        st.session_state.flag = 0
+    if pause_button:
+        st.session_state.flag = 1
+    if st.session_state.flag == 0:
+        i = st.session_state.current_state
+        while i < num_of_element - size:
+            step_df = df.iloc[i : size + i]
+            st.session_state.step_df = step_df
+            st.session_state.size1 = size + i
+            lines = plot_animation(step_df)
+            line_plot.altair_chart(lines)
+            time.sleep(1/speed)
+            if st.session_state.flag == 1:
+                # save the current state of the graph
+                st.session_state.current_state = i
+                break
+            i += 1
+            st.session_state.current_state = i
+        if st.session_state.size1 == num_of_element - 1:
+            st.session_state.flag = 1
+            step_df = df.iloc[0:num_of_element]
+            lines = plot_animation(step_df)
+            line_plot.altair_chart(lines)
+            # reset the current state to the start
+            st.session_state.current_state = start
+            st.session_state.step_df = df.iloc[start : start + size]
+    else:
+        # restore the current state of the graph
+        lines = plot_animation(st.session_state.step_df)
+        return line_plot.altair_chart(lines)
+
+    return line_plot
+
+def show_plot(samples, samples_after_moidifcation, sampling_rate):
+    """
+        Function to show plot
+
+        Parameters
+        ----------
+        samples                      : samples from librosa
+        samples_after_moidifcation   : samples after apply changes
+        sampling_rate                : sampling rate from librosa
+
+        Return
+        ----------
+        None             
+    """ 
+    time_before = np.array(range(0, len(samples)))/(sampling_rate)
+    time_after = np.array(range(0, len(samples)))/(sampling_rate)
+
+    df_afterUpload = pd.DataFrame({'time': time_before[::500], 'amplitude': samples[::500], }, columns=['time',
+                                                                                                        'amplitude'])
+    df_afterInverse = pd.DataFrame({'time_after': time_after[::500], 'amplitude after processing':
+                                    samples_after_moidifcation[::500]}, columns=['time_after', 'amplitude after processing'])
+    common_df = df_afterUpload.merge(df_afterInverse, left_on='time', right_on='time_after')
+    common_df.pop("time_after")
+    num_of_element = common_df.shape[0]  # number of elements in the dataframe
+    burst = 10  # number of elements (months) to add to the plot
+    size = burst
+    line_plot = currentState(common_df, size, num_of_element)
+    plotRep(common_df, size, st.session_state.start, num_of_element, line_plot)
+
+   
+#_______________________________Spectogram Function____________________________#
+
+
+def spectogram(y,  title_of_graph):
+    """
+        Function to spectrogram
+
+        Parameters
+        ----------
+        y
+        title_of_graph  
+
+        Return
+        ----------
+        spectrogram             
+    """
+    D = librosa.stft(y)  # STFT of y
+    # apply logarithm to cast amplitude to Decibels
+    S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
+    fig, ax = plt.subplots()
+    img = librosa.display.specshow(S_db, x_axis='time', y_axis='linear', ax=ax)
+    ax.set(title=title_of_graph)
+    fig.colorbar(img, ax=ax, format="%+2.f dB")
+    return plt.gcf()
+
     
