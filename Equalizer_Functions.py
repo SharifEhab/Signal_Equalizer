@@ -280,9 +280,3 @@ def modify_medical_signal(Ecg_file, sliders_value):
     pio.show(fig_sig)
 
     return time_domain_amplitude
-
-#_________________________________Audio show Function_________________________________#
-
-
-#________________________________Animation Function_____________________________#
-
