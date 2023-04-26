@@ -7,6 +7,7 @@ import librosa.display
 from numpy.fft import fft,rfft,rfftfreq,irfft,fftfreq
 import plotly.graph_objects as go
 import plotly.io as pio
+import streamlit as st
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -180,6 +181,38 @@ def Inverse_Fourier_Transform(Magnitude_frequency_components):
     
     return np.real(Amplitude_time_domain)  #ensure the output is real.
 
+#________________________________Modification of signals Function___________________________________#
+
+
+def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain, ValueOfSlider, ComponentRanges):
+    """
+    Function to apply changes in frequency / musical instrumntation  / vowels
+
+        Parameters
+        ----------
+        SliderName            : According to mode Slider Name varies and its number example Vowels SliderName: A, E, U, T, S
+        FrequencyMagnitude    : magnitude in frequency domain which you want to change it.
+        FrequencyDomain       : frequency after apply fourier transform
+        ValueOfSlider         : value to select the range of frequency to change magnitude.
+        Componentranges       : ranges Component Frequency
+
+        Return
+        ----------
+        FrequencyMagnitude : magnitude after apply changes.
+
+    """
+
+    for Name in range(len(ValueOfSlider)): #Loob on Slider exist in the selected mode
+        if ValueOfSlider[Name]==None: # application by defalut set avlue of slider = none so we change it to 1
+            ValueOfSlider[Name] = 1
+        MagnitudeIndex = 0
+        for Frequencies in FrequencyDomain: #Loob on components of frequencies(x-axis) in frequencyDomain
+            if ComponentRanges[SliderName[Name]][1]> Frequencies and ComponentRanges[SliderName[Name]][0]<Frequencies : # Check if FreqeuncyDomain at location frequency example ate 1200 in ranages of the component frequnecy do the next
+                FrequencyMagnitude[MagnitudeIndex] *= ValueOfSlider[MagnitudeIndex] #Modify the Magnitude of the frequencies
+            MagnitudeIndex +=1
+    
+    return FrequencyMagnitude #return Modified Magnitude
+
 def modify_medical_signal(Ecg_file, sliders_value):
     """
     Function to apply changes to a medical instrument signal.
@@ -247,3 +280,9 @@ def modify_medical_signal(Ecg_file, sliders_value):
     pio.show(fig_sig)
 
     return time_domain_amplitude
+
+#_________________________________Audio show Function_________________________________#
+
+
+#________________________________Animation Function_____________________________#
+
