@@ -8,6 +8,7 @@ from numpy.fft import fft,rfft,rfftfreq,irfft,fftfreq
 import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
+import soundfile as soundf
 #_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
@@ -76,10 +77,10 @@ def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_st
     Generate vertical sliders for different equalizer modes
     Parameters
     ----------
-    Slider_labels : label for each slider that controls the magnitude of certain frequency 
+    array_slider_labels : label for each slider that controls the magnitude of certain frequency 
     ranges for the different modes 
     
-    Slider_values: factor that would be multiplied with the magnitude of some frequency 
+    array_slider_values: factor that would be multiplied with the magnitude of some frequency 
     components
     
     Slider_step: step of increment/decrement for each slider
@@ -202,11 +203,11 @@ def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain,
 
     """
 
-    for Name in range(len(ValueOfSlider)): #Loob on Slider exist in the selected mode
+    for Name in range(len(ValueOfSlider)): #Loop on Slider exist in the selected mode
         if ValueOfSlider[Name]==None: # application by defalut set avlue of slider = none so we change it to 1
             ValueOfSlider[Name] = 1
         MagnitudeIndex = 0
-        for Frequencies in FrequencyDomain: #Loob on components of frequencies(x-axis) in frequencyDomain
+        for Frequencies in FrequencyDomain: #Loop on components of frequencies(x-axis) in frequencyDomain
             if ComponentRanges[SliderName[Name]][1]> Frequencies and ComponentRanges[SliderName[Name]][0]<Frequencies : # Check if FreqeuncyDomain at location frequency example ate 1200 in ranages of the component frequnecy do the next
                 FrequencyMagnitude[MagnitudeIndex] *= ValueOfSlider[MagnitudeIndex] #Modify the Magnitude of the frequencies
             MagnitudeIndex +=1
@@ -280,3 +281,66 @@ def modify_medical_signal(Ecg_file, sliders_value):
     pio.show(fig_sig)
 
     return time_domain_amplitude
+
+
+def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signal_time,sampling_rate,bool_spectrogram,dict_freq_ranges):
+    """
+    Function to process the signal and show the time plots and spectrograms of uploaded signal before and after modifying the magnitude of some frequencies
+    1- Perform fourier transform and get magnitude of freq components
+    2- Modify magnitude of frequency components according to all_sliders_values
+    3- Inverse fourier transform to get modified magnitude back in time domain
+    Parameters
+    ----------
+    selected_mode : Uniform/music/vowels modes
+    slider_labels : Label of each slider in the mode i.e.(Drums,Piano,etc..)
+    magnitude_signal_time : Mag of signal in time domain
+    bool_spectrogram : show or hide spectrogram
+    dict_freq_ranges : dictionary containing labels and ranges of sliders
+    
+    Return
+    ------
+    
+    """
+ 
+    
+    if selected_mode == 'Uniform Range' or 'Vowels' or 'Music Instrument':
+        col_timeplot_before,col_timeplot_after = st.columns(2)
+        col_spectro_before,col_spectro_after = st.columns(2)
+        all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
+        
+        magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
+        
+        magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
+        
+        magnitude_time_modified = Inverse_Fourier_Transform(magnitude_frequency_modified)
+        
+        modified_audio(magnitude_time_modified,sampling_rate)  
+        
+     #   with col_timeplot_before:
+          
+       #   show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
+      #  if bool_spectrogram ==1:
+      #     with col_spectro_before:
+     #          st.pyplot(spectrogram(magnitude_signal_time,"Before")) 
+            
+    #        with col_spectro_after:
+   #             st.pyplot(spectrogram(magnitude_time_modified,"After"))
+                
+                
+def modified_audio(magnitude_time_modified,sample_rate) :
+    
+    """
+    Function to display audio after modifications
+     Parameters
+        ----------
+        magnitude_time_modified : magnitude in time domain after modifications
+        sample rate  
+        Return
+        ----------
+        none            
+    """            
+    st.sidebar.write("#Audio after")
+    soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
+    st.sidebar.audio("modified.wav")
+    
+    
