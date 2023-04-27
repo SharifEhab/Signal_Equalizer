@@ -66,7 +66,7 @@ if file:
 
     elif Mode == 'Vowels':
         # Create a list of vowels
-        vowels = ['E', 'T', 'A', 'O']
+        vowels = ['E', 'ʃ', 'A', 'ʊ','B']
         # Create an empty dictionary to store vowel ranges
         dictnoary_values = {}
         # Loop through each vowel
