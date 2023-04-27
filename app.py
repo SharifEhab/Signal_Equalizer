@@ -10,6 +10,11 @@ with open("style.css") as design:
 
 if 'Spectogram_Graph' not in st.session_state:
    st.session_state['Spectogram_Graph'] = False 
+
+st.session_state.size1=0
+st.session_state.flag=0
+st.session_state.i=0
+st.session_state.start=0
 #__________SIDEBAR SECTION____________#
 
 with st.sidebar:

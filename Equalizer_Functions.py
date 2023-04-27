@@ -13,66 +13,7 @@ import matplotlib.pyplot as plt
 import time
 import altair as alt
 
-#______Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)_______#
-signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
-
-signal_default_values = np.zeros(len(signal_default_time))  
-
-Final_signal_sum = None       
-
-total_signals_list = [Signal(amplitude=1,frequency=1,phase=0)]  #contains all individual signals (freq components) forming the final or resulted signal 
-
-def Generate_syntheticsignal():
-    global Final_signal_sum
-    
-    for signal in total_signals_list:
-        Final_signal_sum += signal.amplitude * np.cos(2*np.pi*signal.frequency*signal_default_time + signal.phase*np.pi )
-       
-    Final_signal_data={'Time':signal_default_time, 'Amplitude':Final_signal_sum}
-    Final_sig_dataframe = pd.DataFrame(Final_signal_data)
-    return Final_sig_dataframe
-
-
-
-def addSignalToList(amplitude, frequency, phase):
-    """
-    Add signals to added_list
-    :param amplitude: the amplitude of the signal
-    :param frequency: the frequency of the signal
-    :param phase: the phase of the signal
-    """
-
-    signal = Signal(amplitude=amplitude, frequency=frequency, phase=phase)
-    total_signals_list.append(signal)
-   
-def removeSignalFromList(amplitude, frequency, phase):
-    
-    """
-    remove signals from added_list
-    Parameters
-    ----------
-    amplitude : float
-    the amplitude of the signal
-    frequency : float
-    the frequancy of the signal
-    phase : float
-    the phase of the signal
-    """
-
-    for signals in total_signals_list:
-        if signals.amplitude==amplitude and signals.frequency == frequency and signals.phase == phase:
-            total_signals_list.remove(signals)     
-
-def get_Total_signal_list():
-    return total_signals_list
-
-def SignalListClean():
-   
-   total_signals_list.clear()
-
 #_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
-
-
 def to_librosa(file_uploaded):
     """
         Function to upload file from librosa 
@@ -221,84 +162,16 @@ def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain,
 
     """
 
-    for Name in range(len(ValueOfSlider)): #Loop on Slider exist in the selected mode
+    for Name in range(len(ValueOfSlider)):
+        MagnitudeIndex = 0
         if ValueOfSlider[Name]==None: # application by defalut set avlue of slider = none so we change it to 1
             ValueOfSlider[Name] = 1
-        MagnitudeIndex = 0
         for Frequencies in FrequencyDomain: #Loop on components of frequencies(x-axis) in frequencyDomain
-            if ComponentRanges[SliderName[Name]][1]> Frequencies and ComponentRanges[SliderName[Name]][0]<Frequencies : # Check if FreqeuncyDomain at location frequency example ate 1200 in ranages of the component frequnecy do the next
-                FrequencyMagnitude[MagnitudeIndex] *= ValueOfSlider[MagnitudeIndex] #Modify the Magnitude of the frequencies
+            if Frequencies >ComponentRanges[SliderName[Name]][0] and Frequencies < ComponentRanges[SliderName[Name]][1] : # Check if FreqeuncyDomain at location frequency example ate 1200 in ranages of the component frequnecy do the next
+                FrequencyMagnitude[MagnitudeIndex] *= ValueOfSlider[Name] #Modify the Magnitude of the frequencies
             MagnitudeIndex +=1
     
     return FrequencyMagnitude #return Modified Magnitude
-
-def modify_medical_signal(Ecg_file, sliders_value):
-    """
-    Function to apply changes to a medical instrument signal.
-
-    Parameters
-    ----------
-    Ecg_file       : CSV file of ECG 
-        ECG file in CSV format.
-    sliders_value  : list of float
-        Values to be multiplied with the frequency components.
-
-    Returns
-    -------
-    time_domain_amplitude : numpy array
-        Time domain amplitude after applying changes.
-    """
-    fig1 = go.Figure()
-
-    # Set x axis label
-    fig1.update_xaxes(
-        title_text="Frequency", 
-        title_font={"size": 20},
-        title_standoff=25
-    )
-    
-    # Set y axis label
-    fig1.update_yaxes(
-        title_text="Amplitude (mv)",
-        title_font={"size": 20},
-        title_standoff=25
-    )
-
-    for i in range(len(sliders_value)):
-        if sliders_value[i] is None:
-            sliders_value[i] = 1
-
-    # Get the Amplitude and Time from the CSV file
-    time = Ecg_file.iloc[:, 0]
-    amplitude = Ecg_file.iloc[:, 1]
-    sample_period = time[1] - time[0]
-    n_samples = len(time)
-
-    # Apply FFT
-    fourier = np.fft.fft(amplitude)
-    frequencies = np.fft.fftfreq(n_samples, sample_period)
-    counter = 0
-
-    # Modify frequency components
-    for value in frequencies:
-        if value > 130:
-            fourier[counter] *= sliders_value[0]
-        if 130 >= value > 80:
-            fourier[counter] *= sliders_value[1]
-        if value <= 80:
-            fourier[counter] *= sliders_value[2]
-        counter += 1
-
-    # Inverse FFT to get time domain amplitude
-    time_domain_amplitude = np.real(np.fft.ifft(fourier))
-
-    # Add scatter plot to figure
-    fig_sig = fig1.add_scatter(x=time, y=time_domain_amplitude)
-
-    # Show plot using Plotly
-    pio.show(fig_sig)
-
-    return time_domain_amplitude
 
 
 def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signal_time,sampling_rate,bool_spectrogram,dict_freq_ranges):
@@ -321,7 +194,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     """
  
     
-    if selected_mode == 'Uniform Range' or 'Vowels' or 'Music Instrument' or 'Biological Signal Abnormalities':
+    if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' or 'Biological Signal Abnormalities':
         col_timeplot_before,col_timeplot_after = st.columns(2)
         col_spectro_before,col_spectro_after = st.columns(2)
         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
@@ -511,7 +384,6 @@ def show_plot(samples, samples_after_moidifcation, sampling_rate):
 
    
 #__________Spectogram Function_________#
-
 
 def Spectogram(y, title_of_graph):
     """
