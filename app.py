@@ -74,10 +74,14 @@ if file:
             # Set the range of frequencies for each vowel based on its letter
             if vowel == 'E':
                 dictnoary_values[vowel] = [800, 1500]
-            elif vowel == 'T':
-                dictnoary_values[vowel] = [700, 1800]
+            elif vowel == 'ʃ':
+                dictnoary_values[vowel] = [800,5000]
             elif vowel == 'A':
-                dictnoary_values[vowel] = [1000, 2500]
+                dictnoary_values[vowel] = [500,1200]
+            elif vowel =='ʊ':
+                 dictnoary_values[vowel] = [500, 2000]
+            elif vowel == 'B':
+                 dictnoary_values[vowel] = [1200,5000]
         # Create a list of slider values for each vowel
         values_slider = [[0, 10, 1]] * len(vowels)
 
