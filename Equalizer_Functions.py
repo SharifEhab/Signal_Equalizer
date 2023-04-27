@@ -1,3 +1,4 @@
+#Import necessary libraries
 import  streamlit_vertical_slider  as svs
 from Signal_Generation_class import Signal
 import numpy as np
