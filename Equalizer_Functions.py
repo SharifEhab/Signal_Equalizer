@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import time
 import altair as alt
 
-#_______________Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)__________________#
+#______Global Variables/functions for generation of synthetic signal(Sum of pure frequencies)_______#
 signal_default_time = np.arange(0,1,0.001)    #1000 default samples for the time axis   
 
 signal_default_values = np.zeros(len(signal_default_time))  
@@ -88,7 +88,7 @@ def to_librosa(file_uploaded):
         y, sr = librosa.load(file_uploaded)
         return y, sr
    
-#________________________End of functions/ variables for synthetic signal generation__________________________________________________________________________________# 
+#_________End of functions/ variables for synthetic signal generation___________________________# 
 
 def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
     """
@@ -200,7 +200,7 @@ def Inverse_Fourier_Transform(Magnitude_frequency_components):
     
     return np.real(Amplitude_time_domain)  #ensure the output is real.
 
-#________________________________Modification of signals Function___________________________________#
+#___________Modification of signals Function____________#
 
 
 def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain, ValueOfSlider, ComponentRanges):
@@ -343,7 +343,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
             with col_spectro_after:
                Spectogram(magnitude_time_modified,"After")
                 
-#____________________________________Audio After______________________________________#
+#_____________Audio After_____________#
 
 def modified_audio(magnitude_time_modified,sample_rate) :
     """
@@ -360,7 +360,7 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
-#______________________________ Animation Function_____________________________________#
+#__________ Animation Function_____________#
 
 def plot_animation(df):
     """
@@ -390,7 +390,7 @@ def plot_animation(df):
     return figure
 
     
-#______________________________Plot Functions_________________________________#
+#___________Plot Functions____________#
 
 def currentState(df, size, num_of_element):
     """
@@ -510,7 +510,7 @@ def show_plot(samples, samples_after_moidifcation, sampling_rate):
 
 
    
-#_______________________________Spectogram Function____________________________#
+#__________Spectogram Function_________#
 
 
 def Spectogram(y, title_of_graph):
@@ -553,5 +553,3 @@ def Spectogram(y, title_of_graph):
     
     # Display the plot in Streamlit
     st.pyplot(fig)
-
-    

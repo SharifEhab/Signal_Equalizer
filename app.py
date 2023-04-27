@@ -6,14 +6,11 @@ st.set_page_config(page_title="Equalizer", page_icon="✅", layout="wide")
 with open("style.css") as design:
     st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
 
-#________________________SESSION STATE INITIALIZATIONS_________________________#
+#_________SESSION STATE INITIALIZATIONS________#
 
 if 'Spectogram_Graph' not in st.session_state:
    st.session_state['Spectogram_Graph'] = False 
-
-st.session_state.i=0
-
-#_____________________________SIDEBAR SECTION___________________________________#
+#__________SIDEBAR SECTION____________#
 
 with st.sidebar:
     st.markdown('<h1 class="sidebar-title">Equalizer</h1>', unsafe_allow_html=True)
@@ -22,7 +19,7 @@ with st.sidebar:
     Mode = st.selectbox(label="", options=[
                         'Uniform Range', 'Vowels', 'Musical Instruments', 'Biological Signal Abnormalities'])
     
-#___________________________________MAIN CODE_________________________________________#
+#____________MAIN CODE______________#
 if file:
 
     magnitude_at_time, sample_rate = Equalizer_Functions.to_librosa(file)
@@ -88,7 +85,3 @@ if file:
     
     Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
                               sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values)
-
-
-
-        
