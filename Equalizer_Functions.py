@@ -337,7 +337,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         with col_timeplot_before:
           
              show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
-        if bool_spectrogram ==1:
+        if bool_spectrogram ==True:
             with col_spectro_before:
                Spectogram(magnitude_signal_time,"Before")
             with col_spectro_after:
