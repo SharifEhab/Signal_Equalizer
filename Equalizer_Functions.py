@@ -41,7 +41,7 @@ def addSignalToList(amplitude, frequency, phase):
     :param frequency: the frequency of the signal
     :param phase: the phase of the signal
     """
-   
+
     signal = Signal(amplitude=amplitude, frequency=frequency, phase=phase)
     total_signals_list.append(signal)
    
@@ -63,18 +63,32 @@ def removeSignalFromList(amplitude, frequency, phase):
         if signals.amplitude==amplitude and signals.frequency == frequency and signals.phase == phase:
             total_signals_list.remove(signals)     
 
-
 def get_Total_signal_list():
     return total_signals_list
-
 
 def SignalListClean():
    
    total_signals_list.clear()
+
+#_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
+
+
+def to_librosa(file_uploaded):
+    """
+        Function to upload file from librosa 
+        Parameters
+        ----------
+        file uploaded 
+        Return
+        ----------
+        y : samples
+        sr : sampling rate      
+    """
+    if file_uploaded is not None:
+        y, sr = librosa.load(file_uploaded)
+        return y, sr
    
 #________________________End of functions/ variables for synthetic signal generation__________________________________________________________________________________# 
-
-
 
 def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
     """
@@ -140,7 +154,6 @@ def Fourier_Transform_explicit(amplitude_signal,sampling_rate):
     
     Sampling_period = 1/sampling_rate
     
-    
     fft_result = fft(amplitude_signal,number_of_samples) # Compute the one-dimensional DFT using FFT Algorithm.
     
     magnitude_frequency_components = np.abs(fft_result) #Gets the magnitude of frequency components
@@ -174,6 +187,7 @@ def Fourier_Transform_Signal(amplitude_signal, sampling_rate):
     return magnitude_freq_components,frequency_components
 
 def Inverse_Fourier_Transform(Magnitude_frequency_components):
+
     """
     Function to apply inverse fourier transform to transform the signal back to the time 
     domain
@@ -181,7 +195,7 @@ def Inverse_Fourier_Transform(Magnitude_frequency_components):
     After modifying the magnitude of the signal of some frequency components
     we apply the irfft to get the modified signal in the time domain (reconstruction)
     """
-    
+     
     Amplitude_time_domain = irfft(Magnitude_frequency_components) #Transform the signal back to the time domain.
     
     return np.real(Amplitude_time_domain)  #ensure the output is real.
@@ -242,7 +256,7 @@ def modify_medical_signal(Ecg_file, sliders_value):
         title_font={"size": 20},
         title_standoff=25
     )
-
+    
     # Set y axis label
     fig1.update_yaxes(
         title_text="Amplitude (mv)",
@@ -307,7 +321,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     """
  
     
-    if selected_mode == 'Uniform Range' or 'Vowels' or 'Music Instrument':
+    if selected_mode == 'Uniform Range' or 'Vowels' or 'Music Instrument' or 'Biological Signal Abnormalities':
         col_timeplot_before,col_timeplot_after = st.columns(2)
         col_spectro_before,col_spectro_after = st.columns(2)
         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
@@ -325,11 +339,12 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
              show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
         if bool_spectrogram ==1:
             with col_spectro_before:
-               st.pyplot(spectogram(magnitude_signal_time,"Before")) 
+               Spectogram(magnitude_signal_time,"Before")
             with col_spectro_after:
-               st.pyplot(spectogram(magnitude_time_modified,"After"))
+               Spectogram(magnitude_time_modified,"After")
                 
 #____________________________________Audio After______________________________________#
+
 def modified_audio(magnitude_time_modified,sample_rate) :
     """
     Function to display audio after modifications
@@ -456,57 +471,87 @@ def plotRep(df, size, start, num_of_element, line_plot):
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
     """
-        Function to show plot
+    Function to show plot
 
-        Parameters
-        ----------
-        samples                      : samples from librosa
-        samples_after_moidifcation   : samples after apply changes
-        sampling_rate                : sampling rate from librosa
+    Parameters
+    ----------
+    samples: ndarray
+        Samples from librosa.
+    samples_after_moidifcation: ndarray
+        Samples after applying changes.
+    sampling_rate: int
+        Sampling rate from librosa.
 
-        Return
-        ----------
-        None             
-    """ 
-    time_before = np.array(range(0, len(samples)))/(sampling_rate)
-    time_after = np.array(range(0, len(samples)))/(sampling_rate)
+    Return
+    ----------
+    None
+    """
+    time_before = np.arange(0, len(samples)) / sampling_rate
+    time_after = np.arange(0, len(samples)) / sampling_rate
 
-    df_afterUpload = pd.DataFrame({'time': time_before[::500], 'amplitude': samples[::500], }, columns=['time',
-                                                                                                        'amplitude'])
-    df_afterInverse = pd.DataFrame({'time_after': time_after[::500], 'amplitude after processing':
-                                    samples_after_moidifcation[::500]}, columns=['time_after', 'amplitude after processing'])
-    common_df = df_afterUpload.merge(df_afterInverse, left_on='time', right_on='time_after')
-    common_df.pop("time_after")
+    df_after_upload = pd.DataFrame({
+        'time': time_before[::500],
+        'amplitude': samples[::500]
+    })
+
+    df_after_inverse = pd.DataFrame({
+        'time_after': time_after[::500],
+        'amplitude after processing': samples_after_moidifcation[::500]
+    })
+
+    common_df = pd.merge(df_after_upload, df_after_inverse, left_on='time', right_on='time_after')
+    common_df.drop("time_after", axis=1, inplace=True)
+
     num_of_element = common_df.shape[0]  # number of elements in the dataframe
     burst = 10  # number of elements (months) to add to the plot
     size = burst
     line_plot = currentState(common_df, size, num_of_element)
     plotRep(common_df, size, st.session_state.start, num_of_element, line_plot)
 
+
    
 #_______________________________Spectogram Function____________________________#
 
 
-def spectogram(y,  title_of_graph):
+def Spectogram(y, title_of_graph):
     """
-        Function to spectrogram
+        Function to create a spectrogram of a given signal.
 
         Parameters
         ----------
-        y
-        title_of_graph  
+        y : numpy array
+            The time-domain signal to create the spectrogram of.
+        title_of_graph : str
+            The title to be displayed on the spectrogram plot.
 
         Return
         ----------
-        spectrogram             
+        None             
     """
-    D = librosa.stft(y)  # STFT of y
-    # apply logarithm to cast amplitude to Decibels
+    # Compute the STFT of the signal
+    D = librosa.stft(y)
+    
+    # Convert the amplitude to decibels
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
-    fig, ax = plt.subplots()
+    
+    # Set the figure size
+    fig, ax = plt.subplots(figsize=[10, 6])
+    
+    # Plot the spectrogram
     img = librosa.display.specshow(S_db, x_axis='time', y_axis='linear', ax=ax)
-    ax.set(title=title_of_graph)
-    fig.colorbar(img, ax=ax, format="%+2.f dB")
-    return plt.gcf()
+    
+    # Set the title and axis labels
+    ax.set(title=title_of_graph, xlabel='Time', ylabel='Frequency')
+    
+    # Increase the font size of the title and axis labels
+    plt.setp(ax.get_xticklabels(), fontsize=14)
+    plt.setp(ax.get_yticklabels(), fontsize=14)
+    ax.title.set_fontsize(16)
+    
+    # Increase the spacing between the subplots
+    plt.subplots_adjust(hspace=0.6)
+    
+    # Display the plot in Streamlit
+    st.pyplot(fig)
 
     
