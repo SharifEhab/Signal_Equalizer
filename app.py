@@ -1,7 +1,7 @@
 import streamlit as st
 import Equalizer_Functions
 import pandas as pd
-
+import soundfile as soundf
 st.set_page_config(page_title="Equalizer", page_icon="✅", layout="wide")
 with open("style.css") as design:
     st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
@@ -29,7 +29,6 @@ if file:
 
     magnitude_at_time, sample_rate = Equalizer_Functions.to_librosa(file)
     Data_frame_of_medical = pd.DataFrame()
-    pitch_step = 0
     spectogram = st.sidebar.checkbox(label="Spectogram")
     st.sidebar.write("## Audio before")
     st.sidebar.audio(file)
@@ -48,11 +47,8 @@ if file:
                             "7000:8000": [7000, 8000],
                             "8000:9000": [8000, 9000],
                             "9000:10000": [9000, 10000]}
-        values_slider = []
-        for key in dictnoary_values:
-            range_start, range_end = dictnoary_values[key]
-            num_steps = (range_end - range_start) // 100
-            values_slider.append([range_start, range_end, num_steps])
+        values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
+        
 
     elif Mode == 'Vowels':
         vowels = ['E', 'T', 'A', 'O']
@@ -62,17 +58,13 @@ if file:
         values_slider = [[0, 10, 1]] * len(vowels)
 
     elif Mode == 'Musical Instruments':
-        dictnoary_values = {"Drum ": [0, 500],
-                            "Flute": [500, 1000],
-                            "Key": [1000, 2000],
-                            "Piano": [2000, 5000]
+        dictnoary_values = {"Tuba ": [40, 350],
+                            "Picolo": [500, 3950]
                         }
-        values_slider = []
-        for value_range in dictnoary_values.values():
-            start = value_range[0]
-            end = value_range[1]
-            step = (end - start) / 100
-            values_slider.append([start, end, step])
+        values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
+        
+         
+      
     
     elif Mode == 'Biological Signal Abnormalities':
         dictnoary_values = {"Alpha Waves": [8, 13],
