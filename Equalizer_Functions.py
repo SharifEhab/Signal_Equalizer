@@ -197,7 +197,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     """
  
     
-    if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' or 'Biological Signal Abnormalities':
+    if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments':
         col_timeplot_before,col_timeplot_after = st.columns(2)
         col_spectro_before,col_spectro_after = st.columns(2)
         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
@@ -484,7 +484,7 @@ def Spectogram(y, title_of_graph):
     # Compute the STFT of the signal
     D = librosa.stft(y)
     
-    # Convert the amplitude to decibels
+    # Convert the amplitude to logarithmic scale (decible)
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
     
     # Set the figure size
