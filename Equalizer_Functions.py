@@ -267,7 +267,7 @@ def modifiy_medical_signal(Ecg_file, sliders_value):
         title_font={"size": 20},
         title_standoff=25
     )
-    print(2)
+    
 
     for i in range(len(sliders_value)):
         if sliders_value[i] is None:
@@ -283,7 +283,7 @@ def modifiy_medical_signal(Ecg_file, sliders_value):
     fourier = np.fft.fft(amplitude)
     frequencies = np.fft.fftfreq(n_samples, sample_period)
     counter = 0
-    print(12)
+    
 
     # Modify frequency components
     for value in frequencies:
@@ -297,16 +297,16 @@ def modifiy_medical_signal(Ecg_file, sliders_value):
 
     # Inverse FFT to get time domain amplitude
     time_domain_amplitude = np.real(np.fft.ifft(fourier))
-    print(122)
+    
 
     # Add scatter plot to figure
     fig_sig = fig1.add_scatter(x=time, y=time_domain_amplitude)
-    print(13)
+    
 
     # Show plot using Plotly
     st.plotly_chart(fig1)
 
-    print(1333)
+    
 
     return time_domain_amplitude
 
