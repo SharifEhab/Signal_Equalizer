@@ -59,7 +59,7 @@ def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_st
             st.write(array_slider_labels[col_number]) 
             
     return different_slider_values         
-
+   #array of arrays
 
 def load_audio_file(path_file_upload):
     
@@ -230,7 +230,7 @@ def modified_audio(magnitude_time_modified,sample_rate) :
         ----------
         none            
     """            
-    st.sidebar.write("#Audio after")
+    st.sidebar.write("## Audio after")
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
@@ -248,6 +248,9 @@ def plot_animation(df):
         ----------
         figure             
     """ 
+    #this function creates a animated line chart.
+    #The chart displays two lines of data, one representing the amplitude of a signal over time
+    #and the other representing the amplitude of the same signal after it has been processed. 
     brush = alt.selection_interval()
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
@@ -316,6 +319,7 @@ def plotRep(df, size, start, num_of_element, line_plot):
     if st.session_state.flag == 0:
         i = st.session_state.current_state
         while i < num_of_element - size:
+        # num_of_element - number of elements in the dataframe
             step_df = df.iloc[i : size + i]
             st.session_state.step_df = step_df
             st.session_state.size1 = size + i

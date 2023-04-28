@@ -19,6 +19,7 @@ st.session_state.size1=0
 st.session_state.flag=0
 st.session_state.i=0
 st.session_state.start=0
+
 #__________SIDEBAR SECTION____________#
 
 with st.sidebar:
