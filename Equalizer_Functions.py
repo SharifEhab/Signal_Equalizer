@@ -13,6 +13,8 @@ import soundfile as soundf
 import matplotlib.pyplot as plt
 import time
 import altair as alt
+import plotly.graph_objs as go
+from plotly.offline import iplot
 
 #_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
 def to_librosa(file_uploaded):
@@ -233,6 +235,80 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     st.sidebar.write("## Audio after")
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
+
+def modifiy_medical_signal(Ecg_file, sliders_value):
+    """
+    Function to apply changes to a medical instrument signal.
+
+    Parameters
+    ----------
+    Ecg_file       : CSV file of ECG 
+        ECG file in CSV format.
+    sliders_value  : list of float
+        Values to be multiplied with the frequency components.
+
+    Returns
+    -------
+    time_domain_amplitude : numpy array
+        Time domain amplitude after applying changes.
+    """
+    fig1 = go.Figure()
+
+    # Set x axis label
+    fig1.update_xaxes(
+        title_text="Frequency", 
+        title_font={"size": 20},
+        title_standoff=25
+    )
+    
+    # Set y axis label
+    fig1.update_yaxes(
+        title_text="Amplitude (mv)",
+        title_font={"size": 20},
+        title_standoff=25
+    )
+    print(2)
+
+    for i in range(len(sliders_value)):
+        if sliders_value[i] is None:
+            sliders_value[i] = 1
+
+    # Get the Amplitude and Time from the CSV file
+    time = Ecg_file.iloc[:, 0]
+    amplitude = Ecg_file.iloc[:, 1]
+    sample_period = time[1] - time[0]
+    n_samples = len(time)
+
+    # Apply FFT
+    fourier = np.fft.fft(amplitude)
+    frequencies = np.fft.fftfreq(n_samples, sample_period)
+    counter = 0
+    print(12)
+
+    # Modify frequency components
+    for value in frequencies:
+        if value > 130:
+            fourier[counter] *= sliders_value[0]
+        if 130 >= value > 80:
+            fourier[counter] *= sliders_value[1]
+        if value <= 80:
+            fourier[counter] *= sliders_value[2]
+        counter += 1
+
+    # Inverse FFT to get time domain amplitude
+    time_domain_amplitude = np.real(np.fft.ifft(fourier))
+    print(122)
+
+    # Add scatter plot to figure
+    fig_sig = fig1.add_scatter(x=time, y=time_domain_amplitude)
+    print(13)
+
+    # Show plot using Plotly
+    st.plotly_chart(fig1)
+
+    print(1333)
+
+    return time_domain_amplitude
 
 #__________ Animation Function_____________#
 
