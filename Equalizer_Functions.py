@@ -371,11 +371,11 @@ def currentState(df, size, num_of_element):
     lines = plot_animation(step_df)
     line_plot = st.altair_chart(lines)
 
-    if st.session_state.i + num_of_element < size:
-        if st.button('Next'):
-            st.session_state.i += num_of_element
-    else:
-        st.session_state.i = 0
+   # if st.session_state.i + num_of_element < size:
+    #    if st.button('Next'):
+     #       st.session_state.i += num_of_element
+   # else:
+    #    st.session_state.i = 0
 
     return line_plot
 
@@ -482,7 +482,7 @@ def Spectogram(y, title_of_graph):
         None             
     """
     # Compute the STFT of the signal
-    D = librosa.stft(y)
+    D = librosa.stft(y)  # The result is a complex-valued matrix D that contains the magnitudes and phases of the frequency components of the signal at each time frame.
     
     # Convert the amplitude to logarithmic scale (decible)
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
