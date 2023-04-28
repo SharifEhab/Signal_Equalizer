@@ -170,7 +170,7 @@ def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain,
         if ValueOfSlider[Name]==None: # application by defalut set avlue of slider = none so we change it to 1
             ValueOfSlider[Name] = 1
         for Frequencies in FrequencyDomain: #Loop on components of frequencies(x-axis) in frequencyDomain
-            if Frequencies >ComponentRanges[SliderName[Name]][0] and Frequencies < ComponentRanges[SliderName[Name]][1] : # Check if FreqeuncyDomain at location frequency example ate 1200 in ranages of the component frequnecy do the next
+            if Frequencies >ComponentRanges[SliderName[Name]][0] and Frequencies < ComponentRanges[SliderName[Name]][1] : # Check if frequency component of signal is within range of current slider 
                 FrequencyMagnitude[MagnitudeIndex] *= ValueOfSlider[Name] #Modify the Magnitude of the frequencies
             MagnitudeIndex +=1
     
