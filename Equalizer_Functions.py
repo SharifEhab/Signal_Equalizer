@@ -17,21 +17,7 @@ import plotly.graph_objs as go
 from plotly.offline import iplot
 
 #_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
-def to_librosa(file_uploaded):
-    """
-        Function to upload file from librosa 
-        Parameters
-        ----------
-        file uploaded 
-        Return
-        ----------
-        y : samples
-        sr : sampling rate      
-    """
-    if file_uploaded is not None:
-        y, sr = librosa.load(file_uploaded)
-        return y, sr
-   
+
 #_________End of functions/ variables for synthetic signal generation___________________________# 
 
 def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
@@ -128,7 +114,9 @@ def Fourier_Transform_Signal(amplitude_signal, sampling_rate):
     
     frequency_components = rfftfreq(number_of_samples,sampling_period)
     
-    return magnitude_freq_components,frequency_components
+    max_frequency = frequency_components[np.argmax(np.abs(magnitude_freq_components))]
+    
+    return magnitude_freq_components,frequency_components,max_frequency
 
 def Inverse_Fourier_Transform(Magnitude_frequency_components):
 
@@ -202,7 +190,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         col_spectro_before,col_spectro_after = st.columns(2)
         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
         
-        magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
+        magnitude_signal_frequency,frequency_components,max_frequency = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
         
         magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
         

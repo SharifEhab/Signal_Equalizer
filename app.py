@@ -37,7 +37,7 @@ with st.sidebar:
 if file:
     if file.type == "audio/wav":
 
-        magnitude_at_time, sample_rate = Equalizer_Functions.to_librosa(file)
+        magnitude_at_time, sample_rate,maximum_frequency = Equalizer_Functions.load_audio_file(file)
         Data_frame_of_medical = pd.DataFrame()
         spectogram = st.sidebar.checkbox(label="Spectogram")
         st.sidebar.write("## Audio before")
@@ -47,24 +47,26 @@ if file:
         else:
             st.session_state['Spectogram_Graph'] = False
 
-            # Depending on the selected equalizer mode, set the appropriate dictionary of frequency ranges and slider values
+        # Depending on the selected equalizer mode, set the appropriate dictionary of frequency ranges and slider values
+        #10 Equal ranges of frequency which changes dynamically according to the max freq in the input signal    
         if Mode == 'Uniform Range':
-            dictnoary_values = {"0:1000": [0, 1000],
-                                "1000:2000": [1000, 2000],
-                                "3000:4000": [3000, 4000],
-                                "4000:5000": [4000, 5000],
-                                "5000:6000": [5000, 6000],
-                                "6000:7000": [6000, 7000],
-                                "7000:8000": [7000, 8000],
-                                "8000:9000": [8000, 9000],
-                                "9000:10000": [9000, 10000]}
-            values_slider = []
+            dictnoary_values = {}
+            frequency_step = maximum_frequency/10
+            for frequency_range_index in range(10):
+                start_freq = frequency_range_index*frequency_step
+                end_freq = (frequency_range_index+1)*frequency_step
+                freq_range = f"{int(start_freq)}:{int(end_freq)}"
+                dictnoary_values[freq_range] = [start_freq,end_freq]
+                
+            values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
+            
             # For each frequency range, calculate the number of slider steps required and add it to the slider values list
+            """
             for key in dictnoary_values:
                 range_start, range_end = dictnoary_values[key]
                 num_steps = (range_end - range_start) // 100
                 values_slider.append([range_start, range_end, num_steps])
-            
+            """
 
         elif Mode == 'Vowels':
             # Create a list of vowels
