@@ -37,7 +37,8 @@ with st.sidebar:
 if file:
     if file.type == "audio/wav":
 
-        magnitude_at_time, sample_rate,maximum_frequency = Equalizer_Functions.load_audio_file(file)
+        magnitude_at_time, sample_rate = Equalizer_Functions.load_audio_file(file)
+        maximum_frequency = Equalizer_Functions.Get_Max_Frequency(magnitude_at_time, sample_rate)  #Get Max frequency
         Data_frame_of_medical = pd.DataFrame()
         spectogram = st.sidebar.checkbox(label="Spectogram")
         st.sidebar.write("## Audio before")
@@ -61,12 +62,7 @@ if file:
             values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
             
             # For each frequency range, calculate the number of slider steps required and add it to the slider values list
-            """
-            for key in dictnoary_values:
-                range_start, range_end = dictnoary_values[key]
-                num_steps = (range_end - range_start) // 100
-                values_slider.append([range_start, range_end, num_steps])
-            """
+          
 
         elif Mode == 'Vowels':
             # Create a list of vowels

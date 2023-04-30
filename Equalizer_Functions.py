@@ -114,9 +114,24 @@ def Fourier_Transform_Signal(amplitude_signal, sampling_rate):
     
     frequency_components = rfftfreq(number_of_samples,sampling_period)
     
+    
+    return magnitude_freq_components,frequency_components
+
+
+def Get_Max_Frequency(amplitude_signal, sampling_rate):
+    
+    number_of_samples = len(amplitude_signal)
+    
+    sampling_period = 1/sampling_rate
+    
+    magnitude_freq_components = rfft(amplitude_signal)
+    
+    frequency_components = rfftfreq(number_of_samples,sampling_period)
+    
     max_frequency = frequency_components[np.argmax(np.abs(magnitude_freq_components))]
     
-    return magnitude_freq_components,frequency_components,max_frequency
+    return max_frequency
+
 
 def Inverse_Fourier_Transform(Magnitude_frequency_components):
 
@@ -190,7 +205,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         col_spectro_before,col_spectro_after = st.columns(2)
         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
         
-        magnitude_signal_frequency,frequency_components,max_frequency = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
+        magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
         
         magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
         
