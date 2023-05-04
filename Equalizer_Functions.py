@@ -382,51 +382,52 @@ def currentState(df, size, num_of_element):
 
     return line_plot
 
-
+#play_button = play.button('▶️')
+#pause_button = pause.button('⏸️')
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
     if 'step_df' not in st.session_state:
         st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
-    # add buttons and slider to the sidebar
-    play, pause = st.sidebar.columns([1,1])
-    play_button = play.button('Play')
-    pause_button = pause.button('Pause')
+    # add button and slider to the sidebar
+    button_col, = st.sidebar.columns([1])
+    is_playing = st.session_state.get('is_playing', True)
+    play_pause_button_text = "⏸️" if is_playing else "▶️"
+    play_pause_button = button_col.button(play_pause_button_text)
+
     speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
-    if play_button:
-        st.session_state.flag = 0
-    if pause_button:
-        st.session_state.flag = 1
-    if st.session_state.flag == 0:
+
+    if play_pause_button:
+        st.session_state.is_playing = not is_playing
+
+    if st.session_state.is_playing:
         i = st.session_state.current_state
         while i < num_of_element - size:
-        # num_of_element - number of elements in the dataframe
             step_df = df.iloc[i : size + i]
             st.session_state.step_df = step_df
             st.session_state.size1 = size + i
             lines = plot_animation(step_df)
             line_plot.altair_chart(lines)
             time.sleep(1/speed)
-            if st.session_state.flag == 1:
-                # save the current state of the graph
+            if not st.session_state.is_playing:
                 st.session_state.current_state = i
                 break
             i += 1
             st.session_state.current_state = i
         if st.session_state.size1 == num_of_element - 1:
-            st.session_state.flag = 1
+            st.session_state.is_playing = False
             step_df = df.iloc[0:num_of_element]
             lines = plot_animation(step_df)
             line_plot.altair_chart(lines)
-            # reset the current state to the start
             st.session_state.current_state = start
             st.session_state.step_df = df.iloc[start : start + size]
     else:
-        # restore the current state of the graph
         lines = plot_animation(st.session_state.step_df)
         return line_plot.altair_chart(lines)
 
     return line_plot
+
+
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
     """
