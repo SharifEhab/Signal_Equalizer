@@ -388,9 +388,11 @@ def plotRep(df, size, start, num_of_element, line_plot):
         st.session_state.current_state = start
     if 'step_df' not in st.session_state:
         st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
-    play_button = st.button('Play')
-    pause_button = st.button('Pause')
-    speed = st.slider('Speed', min_value=1, max_value=10, value=5)
+    # add buttons and slider to the sidebar
+    play, pause = st.sidebar.columns([1,1])
+    play_button = play.button('Play')
+    pause_button = pause.button('Pause')
+    speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
     if play_button:
         st.session_state.flag = 0
     if pause_button:

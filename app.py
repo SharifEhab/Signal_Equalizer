@@ -113,11 +113,3 @@ if file:
                 slider = Equalizer_Functions.generate_vertical_sliders(
                     list(dictnoary_values.keys()), values_slider, 0.1)
                 Equalizer_Functions.modifiy_medical_signal(Data_frame_of_medical, slider)
-                
-
-
-
-
-
-    
-    
