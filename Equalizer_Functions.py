@@ -398,6 +398,7 @@ def plotRep(df, size, start, num_of_element, line_plot):
     speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
+        play_pause_button_text = "⏸️" if not is_playing else "▶️"
         st.session_state.is_playing = not is_playing
 
     if st.session_state.is_playing:
