@@ -388,11 +388,14 @@ def plotRep(df, size, start, num_of_element, line_plot):
     if 'step_df' not in st.session_state:
         st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
     # add button and slider to the sidebar
-    button_col, = st.sidebar.columns([1])
     is_playing = st.session_state.get('is_playing', True)
+    if 'is_playing' not in st.session_state:
+        st.session_state.is_playing = not is_playing
+    button_col, = st.sidebar.columns([1])
+    
     play_pause_button_text = "⏸️" if is_playing else "▶️"
     play_pause_button = button_col.button(play_pause_button_text)
-    
+
     speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
@@ -425,7 +428,6 @@ def plotRep(df, size, start, num_of_element, line_plot):
         return line_plot.altair_chart(lines)
 
     return line_plot
-
 
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
@@ -501,9 +503,11 @@ def Spectogram(y, title_of_graph):
     # Set the title and axis labels
     ax.set(title=title_of_graph, xlabel='Time', ylabel='Frequency')
     
+    fig.colorbar(img, ax=ax, format="%+2.f dB")
+    
     # Increase the font size of the title and axis labels
-    plt.setp(ax.get_xticklabels(), fontsize=14)
-    plt.setp(ax.get_yticklabels(), fontsize=14)
+    ax.xaxis.label.set_fontsize(14)
+    ax.yaxis.label.set_fontsize(14)
     ax.title.set_fontsize(16)
     
     # Increase the spacing between the subplots
