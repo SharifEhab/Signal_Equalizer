@@ -39,7 +39,7 @@ if file:
 
         magnitude_at_time, sample_rate = Equalizer_Functions.load_audio_file(file)
         maximum_frequency = Equalizer_Functions.Get_Max_Frequency(magnitude_at_time, sample_rate)  #Get Max frequency
-        Data_frame_of_medical = pd.DataFrame()
+        #Data_frame_of_medical = pd.DataFrame()
         spectogram = st.sidebar.checkbox(label="Spectogram")
         st.sidebar.write("## Audio before")
         st.sidebar.audio(file)
@@ -96,20 +96,32 @@ if file:
             # Each element in the list is itself a list with 3 values: start, end, and step size for the slider
             # We set the step size to 1 to allow for more precise adjustments of the sliders
             values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
-        Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
-                              sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values)
-    elif file.type == "text/csv":        
-        if Mode == 'Biological Signal Abnormalities':
+        
+       # if Mode != 'Biological Signal Abnormalities': 
+        #    Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
+         #                     sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values)
+         
+         
+        elif Mode == 'Biological Signal Abnormalities':
+            
                 
             # create a dictionary containing the frequency ranges for various types of biological signal abnormalities
-                dictnoary_values = {"arrythmia 1": [0, 0],
-                                    "arrythmia 2": [0, 0],
-                                    "arrythmia 3": [0, 0],
+            dictnoary_values = {"Mitral Stenosis":[10,300]
                                     }
-                values_slider = [[0.0, 2.0, 1]] * \
-                    len(list(dictnoary_values.keys()))
-                Data_frame_of_medical = pd.read_csv(file)
+            values_slider = [[0.0, 5.0, 1]] * len(list(dictnoary_values.keys()))
+            #Data_frame_of_medical = pd.read_csv(file)
                 
-                slider = Equalizer_Functions.generate_vertical_sliders(
-                    list(dictnoary_values.keys()), values_slider, 0.1)
-                Equalizer_Functions.modifiy_medical_signal(Data_frame_of_medical, slider)
+         #   slider = Equalizer_Functions.generate_vertical_sliders(
+        #            list(dictnoary_values.keys()), values_slider, 0.1)
+          #  Equalizer_Functions.modifiy_medical_signal( Mode,magnitude_at_time,sample_rate,st.session_state['Spectogram_Graph'],dictnoary_values,list(dictnoary_values.keys()),values_slider) 
+          
+        Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
+                              sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values)
+            
+
+
+
+
+
+    
+    
