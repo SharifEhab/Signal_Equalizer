@@ -334,7 +334,7 @@ def plot_animation(df):
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
     ).properties(
-        width=400,
+        width=340,
         height=200
     ).add_selection(
         brush).interactive()
@@ -382,8 +382,6 @@ def currentState(df, size, num_of_element):
 
     return line_plot
 
-#play_button = play.button('▶️')
-#pause_button = pause.button('⏸️')
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
@@ -394,7 +392,7 @@ def plotRep(df, size, start, num_of_element, line_plot):
     is_playing = st.session_state.get('is_playing', True)
     play_pause_button_text = "⏸️" if is_playing else "▶️"
     play_pause_button = button_col.button(play_pause_button_text)
-
+    
     speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
@@ -495,7 +493,7 @@ def Spectogram(y, title_of_graph):
     S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
     
     # Set the figure size
-    fig, ax = plt.subplots(figsize=[10, 6])
+    fig, ax = plt.subplots()
     
     # Plot the spectrogram
     img = librosa.display.specshow(S_db, x_axis='time', y_axis='linear', ax=ax)
