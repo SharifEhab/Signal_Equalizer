@@ -15,7 +15,7 @@ import time
 import altair as alt
 import plotly.graph_objs as go
 from plotly.offline import iplot
-
+import scipy.io.wavfile as wav 
 #_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
 
 #_________End of functions/ variables for synthetic signal generation___________________________# 
@@ -198,30 +198,38 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     ------
     
     """
- 
+      
     
     if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments':
         col_timeplot_before,col_timeplot_after = st.columns(2)
-        col_spectro_before,col_spectro_after = st.columns(2)
-        all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
+    
+    
         
-        magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
+    col_spectro_before,col_spectro_after = st.columns(2)
+    all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
         
-        magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
-        
-        magnitude_time_modified = Inverse_Fourier_Transform(magnitude_frequency_modified)
-        
-        modified_audio(magnitude_time_modified,sampling_rate)  
-        
-        with col_timeplot_before:
+    magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
+    
+    magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
+    
+    magnitude_time_modified = Inverse_Fourier_Transform(magnitude_frequency_modified)
+    
+    modified_audio(magnitude_time_modified,sampling_rate)  
+    if selected_mode == 'Biological Signal Abnormalities' :
+        modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
           
-             show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
-        if bool_spectrogram ==1:
-            with col_spectro_before:
-               Spectogram(magnitude_signal_time,"Before")
-            with col_spectro_after:
-               Spectogram(magnitude_time_modified,"After")
-                
+    elif selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' :
+        with col_timeplot_before:
+            show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
+            
+      
+        
+    if bool_spectrogram ==1:
+        with col_spectro_before:
+            Spectogram(magnitude_signal_time,"Before")
+        with col_spectro_after:
+            Spectogram(magnitude_time_modified,"After")
+            
 #_____________Audio After_____________#
 
 def modified_audio(magnitude_time_modified,sample_rate) :
@@ -239,14 +247,14 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
-def modifiy_medical_signal(Ecg_file, sliders_value):
+def modifiy_medical_signal( amplitude,magnitude_time_modified,samplingrate):
     """
     Function to apply changes to a medical instrument signal.
 
     Parameters
     ----------
-    Ecg_file       : CSV file of ECG 
-        ECG file in CSV format.
+    Ecg_file       : wav file of ECG (PCG)
+        ECG file in wav format.
     sliders_value  : list of float
         Values to be multiplied with the frequency components.
 
@@ -255,11 +263,13 @@ def modifiy_medical_signal(Ecg_file, sliders_value):
     time_domain_amplitude : numpy array
         Time domain amplitude after applying changes.
     """
+    
+    #time_plot_col = st.columns(2)
     fig1 = go.Figure()
 
     # Set x axis label
     fig1.update_xaxes(
-        title_text="Frequency", 
+        title_text="Time", 
         title_font={"size": 20},
         title_standoff=25
     )
@@ -271,47 +281,59 @@ def modifiy_medical_signal(Ecg_file, sliders_value):
         title_standoff=25
     )
     
+    time = np.arange(0,len(amplitude))/ samplingrate
+    fig1.add_scatter(x=time, y=magnitude_time_modified)
+    st.plotly_chart(fig1, use_container_width=True)
+   # with slider_col:
+        
+    #    sliders_value =  generate_vertical_sliders(slider_labels,val_slider,0.2)
+        
+  #  if sliders_value is None:
+   #     sliders_value = 1
 
-    for i in range(len(sliders_value)):
-        if sliders_value[i] is None:
-            sliders_value[i] = 1
-
-    # Get the Amplitude and Time from the CSV file
-    time = Ecg_file.iloc[:, 0]
-    amplitude = Ecg_file.iloc[:, 1]
-    sample_period = time[1] - time[0]
-    n_samples = len(time)
+    # Get the Amplitude and Time from the wav file
+  
+   # amplitude = Ecg_file.iloc[:, 1]
+    #sample_period = time[1] - time[0]
+    #n_samples = len(time)
 
     # Apply FFT
-    fourier = np.fft.fft(amplitude)
-    frequencies = np.fft.fftfreq(n_samples, sample_period)
-    counter = 0
+   # fourier = np.fft.fft(amplitude)
+    #frequencies = np.fft.fftfreq(n_samples, sample_period)
     
-
+   # fourier , frequencies = Fourier_Transform_Signal(amplitude,samplingrate)
+    
+    #counter = 0
+    
+    #modified_fourier_mag = General_Signal_Equalization(slider_labels, fourier, frequencies, sliders_value, Ecg_dict)
     # Modify frequency components
-    for value in frequencies:
-        if value > 130:
-            fourier[counter] *= sliders_value[0]
-        if 130 >= value > 80:
-            fourier[counter] *= sliders_value[1]
-        if value <= 80:
-            fourier[counter] *= sliders_value[2]
-        counter += 1
+    #for value in frequencies:
+    #    if value >= 10 and value<=300:
+     #       fourier[counter] *= sliders_value
+            
+    #    counter+=1
 
     # Inverse FFT to get time domain amplitude
-    time_domain_amplitude = np.real(np.fft.ifft(fourier))
+   # time_domain_amplitude_modified = np.real(np.fft.ifft(fourier))
     
-
+     
+   # modified_audio(time_domain_amplitude_modified,samplingrate)  
+         
     # Add scatter plot to figure
-    fig_sig = fig1.add_scatter(x=time, y=time_domain_amplitude)
+    #fig1.add_scatter(x=time, y=magnitude_time_modified)
     
+   # with time_plot_col:
+       # Show plot using Plotly
+   # st.plotly_chart(fig1, use_container_width=True)
 
-    # Show plot using Plotly
-    st.plotly_chart(fig1)
+   # spectrogram_before, spectrogram_after = st.columns(2) 
+    #if is_spectrogram == 1 :
+     #   with spectrogram_before:
+      #      Spectogram(amplitude,"Before")
+       # with spectrogram_after:
+        #    Spectogram(time_domain_amplitude_modified,"After")
 
-    
-
-    return time_domain_amplitude
+    return magnitude_time_modified
 
 #__________ Animation Function_____________#
 
@@ -334,7 +356,7 @@ def plot_animation(df):
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
     ).properties(
-        width=340,
+        width=400,
         height=200
     ).add_selection(
         brush).interactive()
@@ -381,6 +403,7 @@ def currentState(df, size, num_of_element):
     #    st.session_state.i = 0
 
     return line_plot
+
 
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
@@ -430,6 +453,7 @@ def plotRep(df, size, start, num_of_element, line_plot):
     return line_plot
 
 
+
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
     """
     Function to show plot
@@ -476,14 +500,12 @@ def show_plot(samples, samples_after_moidifcation, sampling_rate):
 def Spectogram(y, title_of_graph):
     """
         Function to create a spectrogram of a given signal.
-
         Parameters
         ----------
         y : numpy array
             The time-domain signal to create the spectrogram of.
         title_of_graph : str
             The title to be displayed on the spectrogram plot.
-
         Return
         ----------
         None             
