@@ -11,7 +11,7 @@ with open("style.css") as design:
     st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
 
 
-#_________SESSION STATE INITIALIZATIONS________#
+#____SESSION STATE INITIALIZATIONS___#
 
 if 'Spectogram_Graph' not in st.session_state:
    st.session_state['Spectogram_Graph'] = False 
@@ -20,7 +20,7 @@ st.session_state.flag=0
 st.session_state.i=0
 st.session_state.start=0
 
-#__________SIDEBAR SECTION____________#
+#___SIDEBAR SECTION_____#
 
 with st.sidebar:
 # Add a title to the sidebar
@@ -33,7 +33,7 @@ with st.sidebar:
     Mode = st.selectbox(label="", options=[
     'Uniform Range', 'Vowels', 'Musical Instruments', 'Biological Signal Abnormalities'])
     
-#____________MAIN CODE______________#
+#_____MAIN CODE_____#
 if file:
     if file.type == "audio/wav":
 
@@ -41,8 +41,6 @@ if file:
         maximum_frequency = Equalizer_Functions.Get_Max_Frequency(magnitude_at_time, sample_rate)  #Get Max frequency
         #Data_frame_of_medical = pd.DataFrame()
         spectogram = st.sidebar.checkbox(label="Spectogram")
-        st.sidebar.write("## Audio before")
-        st.sidebar.audio(file)
         if spectogram:
             st.session_state['Spectogram_Graph'] = True
         else:
@@ -116,12 +114,4 @@ if file:
           #  Equalizer_Functions.modifiy_medical_signal( Mode,magnitude_at_time,sample_rate,st.session_state['Spectogram_Graph'],dictnoary_values,list(dictnoary_values.keys()),values_slider) 
           
         Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
-                              sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values)
-            
-
-
-
-
-
-    
-    
+                              sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values,file)

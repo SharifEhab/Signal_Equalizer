@@ -17,7 +17,7 @@ from plotly.offline import iplot
 import scipy.io.wavfile as wav 
 #_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ upload Function_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _#
 
-#_________End of functions/ variables for synthetic signal generation___________________________# 
+#____End of functions/ variables for synthetic signal generation__________# 
 
 def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
     """
@@ -146,7 +146,7 @@ def Inverse_Fourier_Transform(Magnitude_frequency_components):
     
     return np.real(Amplitude_time_domain)  #ensure the output is real.
 
-#___________Modification of signals Function____________#
+#____Modification of signals Function_____#
 
 
 def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain, ValueOfSlider, ComponentRanges):
@@ -179,7 +179,7 @@ def General_Signal_Equalization(SliderName, FrequencyMagnitude, FrequencyDomain,
     return FrequencyMagnitude #return Modified Magnitude
 
 
-def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signal_time,sampling_rate,bool_spectrogram,dict_freq_ranges):
+def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signal_time,sampling_rate,bool_spectrogram,dict_freq_ranges,file):
     """
     Function to process the signal and show the time plots and spectrograms of uploaded signal before and after modifying the magnitude of some frequencies
     1- Perform fourier transform and get magnitude of freq components
@@ -201,9 +201,6 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     
     if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments':
         col_timeplot_before,col_timeplot_after = st.columns(2)
-    
-    
-        
     col_spectro_before,col_spectro_after = st.columns(2)
     all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
         
@@ -212,8 +209,8 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
     
     magnitude_time_modified = Inverse_Fourier_Transform(magnitude_frequency_modified)
-    
-    modified_audio(magnitude_time_modified,sampling_rate)  
+    original_audio(file)
+    modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
         modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
           
@@ -221,15 +218,36 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         with col_timeplot_before:
             show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
             
-      
-        
+    # original_audio(file)
+    # modified_audio(magnitude_time_modified,sampling_rate)  
     if bool_spectrogram ==1:
         with col_spectro_before:
             Spectogram(magnitude_signal_time,"Before")
         with col_spectro_after:
             Spectogram(magnitude_time_modified,"After")
             
-#_____________Audio After_____________#
+
+
+            
+#____Aufio Before_____#
+def original_audio(file):
+    """
+    This function displays the original audio file on the sidebar of a Streamlit app.
+
+    Args:
+        file (str): The path of the audio file.
+
+    Returns:
+        None
+    """
+    # Display a header for the original audio file section
+    st.sidebar.write("## Audio before")
+    
+    # Display the audio file on the sidebar
+    st.sidebar.audio(file)
+
+
+#____Audio After____#
 
 def modified_audio(magnitude_time_modified,sample_rate) :
     """
@@ -283,58 +301,10 @@ def modifiy_medical_signal( amplitude,magnitude_time_modified,samplingrate):
     time = np.arange(0,len(amplitude))/ samplingrate
     fig1.add_scatter(x=time, y=magnitude_time_modified)
     st.plotly_chart(fig1, use_container_width=True)
-   # with slider_col:
-        
-    #    sliders_value =  generate_vertical_sliders(slider_labels,val_slider,0.2)
-        
-  #  if sliders_value is None:
-   #     sliders_value = 1
-
-    # Get the Amplitude and Time from the wav file
-  
-   # amplitude = Ecg_file.iloc[:, 1]
-    #sample_period = time[1] - time[0]
-    #n_samples = len(time)
-
-    # Apply FFT
-   # fourier = np.fft.fft(amplitude)
-    #frequencies = np.fft.fftfreq(n_samples, sample_period)
-    
-   # fourier , frequencies = Fourier_Transform_Signal(amplitude,samplingrate)
-    
-    #counter = 0
-    
-    #modified_fourier_mag = General_Signal_Equalization(slider_labels, fourier, frequencies, sliders_value, Ecg_dict)
-    # Modify frequency components
-    #for value in frequencies:
-    #    if value >= 10 and value<=300:
-     #       fourier[counter] *= sliders_value
-            
-    #    counter+=1
-
-    # Inverse FFT to get time domain amplitude
-   # time_domain_amplitude_modified = np.real(np.fft.ifft(fourier))
-    
-     
-   # modified_audio(time_domain_amplitude_modified,samplingrate)  
-         
-    # Add scatter plot to figure
-    #fig1.add_scatter(x=time, y=magnitude_time_modified)
-    
-   # with time_plot_col:
-       # Show plot using Plotly
-   # st.plotly_chart(fig1, use_container_width=True)
-
-   # spectrogram_before, spectrogram_after = st.columns(2) 
-    #if is_spectrogram == 1 :
-     #   with spectrogram_before:
-      #      Spectogram(amplitude,"Before")
-       # with spectrogram_after:
-        #    Spectogram(time_domain_amplitude_modified,"After")
 
     return magnitude_time_modified
 
-#__________ Animation Function_____________#
+#____ Animation Function_____#
 
 def plot_animation(df):
     """
@@ -367,7 +337,7 @@ def plot_animation(df):
     return figure
 
     
-#___________Plot Functions____________#
+#____Plot Functions_____#
 
 def currentState(df, size, num_of_element):
     """
@@ -395,12 +365,6 @@ def currentState(df, size, num_of_element):
     lines = plot_animation(step_df)
     line_plot = st.altair_chart(lines)
 
-   # if st.session_state.i + num_of_element < size:
-    #    if st.button('Next'):
-     #       st.session_state.i += num_of_element
-   # else:
-    #    st.session_state.i = 0
-
     return line_plot
 
 def plotRep(df, size, start, num_of_element, line_plot):
@@ -412,12 +376,14 @@ def plotRep(df, size, start, num_of_element, line_plot):
     is_playing = st.session_state.get('is_playing', True)
     if 'is_playing' not in st.session_state:
         st.session_state.is_playing = not is_playing
-    button_col, = st.sidebar.columns([1])
+    # create columns for the button and slider
+    button_col, slider_col = st.sidebar.columns([1, 2])
+
+    # create play/pause button and slider for speed
     if 'play_pause_button_text' not in st.session_state:
-        st.play_pause_button_text = "▶️"
-    play_pause_button = button_col.button(st.play_pause_button_text)
-    
-    speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
+        st.session_state.play_pause_button_text = "▶️"
+    play_pause_button = button_col.button(st.session_state.play_pause_button_text)
+    speed = slider_col.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
         if is_playing:
@@ -496,7 +462,7 @@ def show_plot(samples, samples_after_moidifcation, sampling_rate):
 
 
    
-#__________Spectogram Function_________#
+#___Spectogram Function____#
 
 def Spectogram(y, title_of_graph):
     """
