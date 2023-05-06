@@ -356,8 +356,8 @@ def plot_animation(df):
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
     ).properties(
-        width=400,
-        height=200
+        width=330,
+        height=170
     ).add_selection(
         brush).interactive()
 
@@ -404,7 +404,6 @@ def currentState(df, size, num_of_element):
 
     return line_plot
 
-
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
@@ -415,15 +414,19 @@ def plotRep(df, size, start, num_of_element, line_plot):
     if 'is_playing' not in st.session_state:
         st.session_state.is_playing = not is_playing
     button_col, = st.sidebar.columns([1])
+    if 'play_pause_button_text' not in st.session_state:
+        st.play_pause_button_text = "▶️"
+    play_pause_button = button_col.button(st.play_pause_button_text)
     
-    play_pause_button_text = "⏸️" if is_playing else "▶️"
-    play_pause_button = button_col.button(play_pause_button_text)
-
     speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
-        play_pause_button_text = "⏸️" if not is_playing else "▶️"
+        if is_playing:
+            st.session_state.play_pause_button_text = "⏸️"  
+        else :
+            st.session_state.play_pause_button_text = "▶️"
         st.session_state.is_playing = not is_playing
+
 
     if st.session_state.is_playing:
         i = st.session_state.current_state
@@ -451,7 +454,6 @@ def plotRep(df, size, start, num_of_element, line_plot):
         return line_plot.altair_chart(lines)
 
     return line_plot
-
 
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
@@ -500,12 +502,14 @@ def show_plot(samples, samples_after_moidifcation, sampling_rate):
 def Spectogram(y, title_of_graph):
     """
         Function to create a spectrogram of a given signal.
+
         Parameters
         ----------
         y : numpy array
             The time-domain signal to create the spectrogram of.
         title_of_graph : str
             The title to be displayed on the spectrogram plot.
+
         Return
         ----------
         None             
