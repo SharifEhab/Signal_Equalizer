@@ -6,7 +6,19 @@ import soundfile as soundf
 # Set page configuration
 st.set_page_config(page_title="Equalizer", page_icon="✅", layout="wide")
 
-# Open CSS file and add styling to page
+# # Open CSS file and add styling to page
+# st.markdown("""
+# <style>
+# #MainMenu
+# {
+#     visibility: hidden;
+# }
+# .css-164nlkn.egzxvld1
+# {
+#     visibility: hidden;
+# }
+#  </style>
+# """, unsafe_allow_html=True)
 with open("style.css") as design:
     st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
 

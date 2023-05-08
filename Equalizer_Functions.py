@@ -209,8 +209,8 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
     
     magnitude_time_modified = Inverse_Fourier_Transform(magnitude_frequency_modified)
-    original_audio(file)
-    modified_audio(magnitude_time_modified,sampling_rate)
+    # original_audio(file)
+    # modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
         modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
           
@@ -218,8 +218,8 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
         with col_timeplot_before:
             show_plot(magnitude_signal_time,magnitude_time_modified,sampling_rate)   # Draw both original and modified plot in the time domain
             
-    # original_audio(file)
-    # modified_audio(magnitude_time_modified,sampling_rate)  
+    original_audio(file)
+    modified_audio(magnitude_time_modified,sampling_rate)  
     if bool_spectrogram ==1:
         with col_spectro_before:
             Spectogram(magnitude_signal_time,"Before")
@@ -372,26 +372,22 @@ def plotRep(df, size, start, num_of_element, line_plot):
         st.session_state.current_state = start
     if 'step_df' not in st.session_state:
         st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
-    # add button and slider to the sidebar
+    # add buttons and slider to the sidebar
     is_playing = st.session_state.get('is_playing', True)
     if 'is_playing' not in st.session_state:
         st.session_state.is_playing = not is_playing
-    # create columns for the button and slider
-    button_col, slider_col = st.sidebar.columns([1, 2])
+    button_col, button_col_2 = st.sidebar.columns(2)
+    play_button = button_col.button('Play')
+    pause_button = button_col_2.button('Pause')
+    speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
-    # create play/pause button and slider for speed
-    if 'play_pause_button_text' not in st.session_state:
-        st.session_state.play_pause_button_text = "▶️"
-    play_pause_button = button_col.button(st.session_state.play_pause_button_text)
-    speed = slider_col.slider('Speed', min_value=1, max_value=50, value=25, step=1)
+    if play_button:
+        # st.session_state.play_pause_button_text = "⏸️"
+        st.session_state.is_playing = True
 
-    if play_pause_button:
-        if is_playing:
-            st.session_state.play_pause_button_text = "⏸️"  
-        else :
-            st.session_state.play_pause_button_text = "▶️"
-        st.session_state.is_playing = not is_playing
-
+    if pause_button:
+        # st.session_state.play_pause_button_text = "▶️"
+        st.session_state.is_playing = False
 
     if st.session_state.is_playing:
         i = st.session_state.current_state
@@ -419,6 +415,8 @@ def plotRep(df, size, start, num_of_element, line_plot):
         return line_plot.altair_chart(lines)
 
     return line_plot
+
+
 
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
