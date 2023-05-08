@@ -201,9 +201,14 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     
     if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments':
         col_timeplot_before,col_timeplot_after = st.columns(2)
+        col_medical,colmode_1 = st.columns([10,1])
     col_spectro_before,col_spectro_after = st.columns(2)
+    # if selected_mode == 'Biological Signal Abnormalities' :
+    #     with colmode_1:
+    #         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
+    
     all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
-        
+    
     magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
     
     magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
@@ -212,7 +217,8 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     # original_audio(file)
     # modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
-        modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
+        with col_medical:
+            modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
           
     elif selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' :
         with col_timeplot_before:

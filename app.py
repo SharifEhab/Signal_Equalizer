@@ -5,20 +5,6 @@ import pandas as pd
 import soundfile as soundf
 # Set page configuration
 st.set_page_config(page_title="Equalizer", page_icon="✅", layout="wide")
-
-# # Open CSS file and add styling to page
-# st.markdown("""
-# <style>
-# #MainMenu
-# {
-#     visibility: hidden;
-# }
-# .css-164nlkn.egzxvld1
-# {
-#     visibility: hidden;
-# }
-#  </style>
-# """, unsafe_allow_html=True)
 with open("style.css") as design:
     st.markdown(f"<style>{design.read()}</style>", unsafe_allow_html=True)
 
@@ -38,7 +24,7 @@ with st.sidebar:
 # Add a title to the sidebar
     st.markdown('<h1 class="sidebar-title">Equalizer</h1>', unsafe_allow_html=True)
     # Create a file uploader in the sidebar and accept only .wav and .audio file types
-    file = st.file_uploader("Choose a file", type=["wav", "audio","csv"], accept_multiple_files=False)
+    file = st.file_uploader("Choose a file", type=["wav", "audio"], accept_multiple_files=False)
     # Add a title to choose the mode in the sidebar
     st.markdown('<h2 class="sidebar-title">Choose the mode</h2>', unsafe_allow_html=True)
     # Create a drop-down selector for choosing the mode in the sidebar
