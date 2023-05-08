@@ -67,34 +67,7 @@ def load_audio_file(path_file_upload):
     if path_file_upload is not None:
         audio_samples,sampling_rate=librosa.load(path_file_upload)
         
-    return audio_samples,sampling_rate    
-
-def Fourier_Transform_explicit(amplitude_signal,sampling_rate):
-    """
-    Nyquist rate = 2fmax
-    Nyquist_freq = 1/2*sampling_freq
-    
-    FFT--->Output complex array that corresponds to the fourier transformed signal
-    It symmetric about the nyquist frequency , so we take the magnitude of the positive 
-    part and multiply it by 2 except for the DC component
-    and the nyquist frequency (To accomodate for the negative part)
-    """
-    number_of_samples = len(amplitude_signal)
-    
-    Sampling_period = 1/sampling_rate
-    
-    fft_result = fft(amplitude_signal,number_of_samples) # Compute the one-dimensional DFT using FFT Algorithm.
-    
-    magnitude_frequency_components = np.abs(fft_result) #Gets the magnitude of frequency components
-    
-    positive_frequencies = magnitude_frequency_components[:number_of_samples//2 +1]  #  Take positive part only
-     
-    positive_frequencies[1:-1] *=2  #Multiply magnitude by two except for DC component and Nyquist frequency
-      
-    frequency_components = fftfreq (number_of_samples,Sampling_period)[:number_of_samples//2 +1]   #Get corresponding frequencies of the magnitude of the FFT
-    
-    return magnitude_frequency_components, frequency_components
-
+    return audio_samples,sampling_rate   
 
 def Fourier_Transform_Signal(amplitude_signal, sampling_rate):
     """
