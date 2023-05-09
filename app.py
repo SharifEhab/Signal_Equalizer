@@ -83,8 +83,9 @@ if file:
 
         elif Mode == 'Musical Instruments':
             # Set the dictionary of frequency ranges for different musical instruments
-            dictnoary_values = {"Tuba ": [40, 350],  # Frequency range for Tuba
-                                "Picolo": [500, 3950]  # Frequency range for Piccolo
+            dictnoary_values = {"Tuba ": [45, 375],  # Frequency range for Tuba
+                                "Picolo": [500, 3950],
+                                "Clarinet": [200, 2000]  # Frequency range for Piccolo
                                 }
 
             # Set the list of slider values for each instrument
