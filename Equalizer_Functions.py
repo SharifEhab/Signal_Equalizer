@@ -364,7 +364,9 @@ def plotRep(df, size, start, num_of_element, line_plot):
     if 'play_pause_button_text' not in st.session_state:
          st.play_pause_button_text = "▶️/⏸️"
     play_pause_button = button_col.button(st.play_pause_button_text)
-    speed = speed_slider.slider('Speed', min_value=1, max_value=50, value=25, step=1)
+    with speed_slider:
+        st.markdown('<p class="sidebar-title">Speed</p>', unsafe_allow_html=True)
+    speed = speed_slider.slider('', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
         st.session_state.is_playing = not is_playing
