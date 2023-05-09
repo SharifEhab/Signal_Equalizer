@@ -309,7 +309,7 @@ def plot_animation(df):
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
     ).properties(
-        width=330,
+        width=410,
         height=170
     ).add_selection(
         brush).interactive()
