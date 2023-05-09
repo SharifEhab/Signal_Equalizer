@@ -24,9 +24,9 @@ with st.sidebar:
 # Add a title to the sidebar
     st.markdown('<h1 class="sidebar-title">Equalizer</h1>', unsafe_allow_html=True)
     # Create a file uploader in the sidebar and accept only .wav and .audio file types
-    file = st.file_uploader("Choose a file", type=["wav", "audio"], accept_multiple_files=False)
+    file = st.file_uploader("", type=["wav", "audio"], accept_multiple_files=False)
     # Add a title to choose the mode in the sidebar
-    st.markdown('<h2 class="sidebar-title">Choose the mode</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="sidebar-title">Modes</h2>', unsafe_allow_html=True)
     # Create a drop-down selector for choosing the mode in the sidebar
     Mode = st.selectbox(label="", options=[
     'Uniform Range', 'Vowels', 'Musical Instruments', 'Biological Signal Abnormalities'])

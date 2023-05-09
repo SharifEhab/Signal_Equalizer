@@ -220,8 +220,7 @@ def original_audio(file):
         None
     """
     # Display a header for the original audio file section
-    st.sidebar.write("## Audio before")
-    
+    st.sidebar.markdown('<h2 class="sidebar-title">Audio before</h2>', unsafe_allow_html=True)
     # Display the audio file on the sidebar
     st.sidebar.audio(file)
 
@@ -239,7 +238,7 @@ def modified_audio(magnitude_time_modified,sample_rate) :
         ----------
         none            
     """            
-    st.sidebar.write("## Audio after")
+    st.sidebar.markdown('<h2 class="sidebar-title">Audio after</h2>', unsafe_allow_html=True)
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
@@ -309,7 +308,7 @@ def plot_animation(df):
     chart1 = alt.Chart(df).mark_line().encode(
         x=alt.X('time', axis=alt.Axis(title='Time')),
     ).properties(
-        width=410,
+        width=400,
         height=170
     ).add_selection(
         brush).interactive()
@@ -354,25 +353,21 @@ def currentState(df, size, num_of_element):
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
-    if 'step_df' not in st.session_state:
-        st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
-    # add buttons and slider to the sidebar
+    
+    # add button and slider to the sidebar
     is_playing = st.session_state.get('is_playing', True)
     if 'is_playing' not in st.session_state:
         st.session_state.is_playing = not is_playing
-    button_col, button_col_2 = st.sidebar.columns(2)
-    play_button = button_col.button('Play')
-    pause_button = button_col_2.button('Pause')
-    speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
+    
+    button_col,speed_slider = st.sidebar.columns([1,2])
+    if 'play_pause_button_text' not in st.session_state:
+         st.play_pause_button_text = "▶️/⏸️"
+    play_pause_button = button_col.button(st.play_pause_button_text)
+    speed = speed_slider.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
-    if play_button:
-        # st.session_state.play_pause_button_text = "⏸️"
-        st.session_state.is_playing = True
-
-    if pause_button:
-        # st.session_state.play_pause_button_text = "▶️"
-        st.session_state.is_playing = False
-
+    if play_pause_button:
+        st.session_state.is_playing = not is_playing
+            
     if st.session_state.is_playing:
         i = st.session_state.current_state
         while i < num_of_element - size:
@@ -389,14 +384,18 @@ def plotRep(df, size, start, num_of_element, line_plot):
             st.session_state.current_state = i
         if st.session_state.size1 == num_of_element - 1:
             st.session_state.is_playing = False
-            step_df = df.iloc[0:num_of_element]
-            lines = plot_animation(step_df)
-            line_plot.altair_chart(lines)
             st.session_state.current_state = start
             st.session_state.step_df = df.iloc[start : start + size]
     else:
-        lines = plot_animation(st.session_state.step_df)
-        return line_plot.altair_chart(lines)
+        # plot the signal up to the current state and set step_df to the current state
+        if st.session_state.current_state == start:
+            step_df = df.iloc[start : start + num_of_element]
+            st.session_state.step_df = step_df
+        else:
+            step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
+            st.session_state.step_df = step_df
+        lines = plot_animation(step_df)
+        line_plot.altair_chart(lines)
 
     return line_plot
 
