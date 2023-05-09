@@ -191,7 +191,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     # modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
         with col_medical:
-            modifiy_medical_signal(magnitude_signal_time,magnitude_time_modified,sampling_rate)   
+            modifiy_medical_signal(magnitude_frequency_modified,frequency_components,sampling_rate)   
           
     elif selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' :
         with col_timeplot_before:
@@ -243,7 +243,7 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
-def modifiy_medical_signal( amplitude,magnitude_time_modified,samplingrate):
+def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     """
     Function to apply changes to a medical instrument signal.
 
@@ -261,13 +261,15 @@ def modifiy_medical_signal( amplitude,magnitude_time_modified,samplingrate):
     """
     
     #time_plot_col = st.columns(2)
+    
     fig1 = go.Figure()
 
     # Set x axis label
     fig1.update_xaxes(
         title_text="Time", 
         title_font={"size": 20},
-        title_standoff=25
+        title_standoff=25,
+        range = [0,500]
     )
     
     # Set y axis label
@@ -277,11 +279,14 @@ def modifiy_medical_signal( amplitude,magnitude_time_modified,samplingrate):
         title_standoff=25
     )
     
-    time = np.arange(0,len(amplitude))/ samplingrate
-    fig1.add_scatter(x=time, y=magnitude_time_modified)
+    power_spectrum = np.abs(mag_freq_mod)**2 
+    
+    freq_axis = np.linspace(0,samplingrate/2,len(power_spectrum))
+    #time = np.arange(0,len(amplitude))/samplingrate
+    fig1.add_scatter(x=freq_axis, y=power_spectrum)
     st.plotly_chart(fig1, use_container_width=True)
 
-    return magnitude_time_modified
+    return power_spectrum
 
 #____ Animation Function_____#
 

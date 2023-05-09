@@ -104,7 +104,7 @@ if file:
             # create a dictionary containing the frequency ranges for various types of biological signal abnormalities
             dictnoary_values = {"Mitral Stenosis":[10,300]
                                     }
-            values_slider = [[0.0, 5.0, 1]] * len(list(dictnoary_values.keys()))
+            values_slider = [[0, 10, 1]] * len(list(dictnoary_values.keys()))
             #Data_frame_of_medical = pd.read_csv(file)
                 
          #   slider = Equalizer_Functions.generate_vertical_sliders(
