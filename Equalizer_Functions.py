@@ -262,7 +262,8 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     #time_plot_col = st.columns(2)
     
     fig1 = go.Figure()
-
+    # Set the height of the figure
+    fig1.update_layout(height=288)      
     # Set x axis label
     fig1.update_xaxes(
         title_text="Time", 

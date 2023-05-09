@@ -58,8 +58,6 @@ if file:
             values_slider = [[0,10,1]]*len(list(dictnoary_values.keys()))
             
             # For each frequency range, calculate the number of slider steps required and add it to the slider values list
-          
-
         elif Mode == 'Vowels':
             # Create a list of vowels
             vowels = ['E', 'ʃ', 'A', 'ʊ','B']
