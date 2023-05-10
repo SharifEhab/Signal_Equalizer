@@ -354,6 +354,12 @@ def currentState(df, size, num_of_element):
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
+    if 'prev_df' not in st.session_state:
+        st.session_state.prev_df = None
+    if 'prev_file' not in st.session_state:
+        st.session_state.prev_file = None
+    if 'selected_file' not in st.session_state:
+        st.session_state.selected_file = None
     
     # add button and slider to the sidebar
     is_playing = st.session_state.get('is_playing', True)
@@ -390,19 +396,18 @@ def plotRep(df, size, start, num_of_element, line_plot):
             st.session_state.current_state = start
             st.session_state.step_df = df.iloc[start : start + size]
     else:
-        # plot the signal up to the current state and set step_df to the current state
-        if st.session_state.current_state == start:
-            step_df = df.iloc[start : start + num_of_element]
-            st.session_state.step_df = step_df
-        else:
-            step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
-            st.session_state.step_df = step_df
+        # plot the signal up to the current state or reset if a new file has been selected
+        if st.session_state.selected_file != st.session_state.prev_file:
+            st.session_state.current_state = start
+            st.session_state.selected_file = st.session_state.prev_file
+        step_df = df.iloc[start : start + num_of_element]
+        st.session_state.step_df = step_df
         lines = plot_animation(step_df)
         line_plot.altair_chart(lines)
+        st.session_state.prev_file = st.session_state.selected_file
+        st.session_state.prev_df = df.copy()
 
     return line_plot
-
-
 
 
 def show_plot(samples, samples_after_moidifcation, sampling_rate):
