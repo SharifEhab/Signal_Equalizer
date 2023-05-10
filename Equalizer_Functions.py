@@ -174,7 +174,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     
     if selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments':
         col_timeplot_before,col_timeplot_after = st.columns(2)
-        col_medical,colmode_1 = st.columns([10,1])
+        col_medical_1,col_medical_2 = st.columns([10,1])
     col_spectro_before,col_spectro_after = st.columns(2)
     # if selected_mode == 'Biological Signal Abnormalities' :
     #     with colmode_1:
@@ -190,8 +190,18 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     # original_audio(file)
     # modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
-        with col_medical:
-            modifiy_medical_signal(magnitude_frequency_modified,frequency_components,sampling_rate)   
+        file_path_normal = r'C:\Users\shiro\OneDrive\Desktop\DSP_Tasks\Task_3\Signal_Equalizer\Normal_Heart.wav'
+        samples_normal, normal_sampling_rate = load_audio_file(file_path_normal)
+        magnitude_freq_normal, freq_normal = Fourier_Transform_Signal(samples_normal,normal_sampling_rate )
+
+
+        with col_medical_1:
+            modifiy_medical_signal(magnitude_frequency_modified,frequency_components,sampling_rate,"Aortic Stenosis")  # Power spectral density of abnormality 
+        
+        with col_medical_2:
+            modifiy_medical_signal(magnitude_freq_normal,freq_normal,normal_sampling_rate,"Normal") # Power spectral density of normal heart sound
+   
+            
           
     elif selected_mode == 'Uniform Range' or 'Vowels' or 'Musical Instruments' :
         with col_timeplot_before:
@@ -242,7 +252,7 @@ def modified_audio(magnitude_time_modified,sample_rate) :
     soundf.write("modified.wav",magnitude_time_modified,sample_rate) #saves the magnitude in time domain as an audio file named "output.wav" using the sample rate provided using the soundfile.write() function
     st.sidebar.audio("modified.wav")
 
-def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
+def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate,title):
     """
     Function to plot  to a  power spectrum of medical signal.
 
@@ -261,7 +271,12 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     
     fig1 = go.Figure()
     # Set the height of the figure
-    fig1.update_layout(height=288)      
+    fig1.update_layout(height=300,
+                       title = title,
+                       
+                       
+                       
+                       )      
     # Set x axis label
     fig1.update_xaxes(
         title_text="Frequency", 
@@ -282,7 +297,7 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     freq_axis = np.linspace(0,samplingrate/2,len(power_spectrum))
     #time = np.arange(0,len(amplitude))/samplingrate
     fig1.add_scatter(x=freq_axis, y=power_spectrum)
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width='10')
      
     return power_spectrum
 
@@ -349,32 +364,37 @@ def currentState(df, size, num_of_element):
 
     return line_plot
 
+
 def plotRep(df, size, start, num_of_element, line_plot):
     if 'current_state' not in st.session_state:
         st.session_state.current_state = start
-    if 'prev_df' not in st.session_state:
-        st.session_state.prev_df = None
-    if 'prev_file' not in st.session_state:
-        st.session_state.prev_file = None
-    if 'selected_file' not in st.session_state:
-        st.session_state.selected_file = None
-    
+    if 'step_df' not in st.session_state:
+        st.session_state.step_df = df.iloc[st.session_state.current_state : st.session_state.current_state + size]
     # add button and slider to the sidebar
     is_playing = st.session_state.get('is_playing', True)
     if 'is_playing' not in st.session_state:
         st.session_state.is_playing = not is_playing
-    
-    button_col,speed_slider = st.sidebar.columns([1,2])
+    button_col, = st.sidebar.columns([1])
     if 'play_pause_button_text' not in st.session_state:
          st.play_pause_button_text = "▶️/⏸️"
+    # if is_playing:
+    #     st.play_pause_button_text = "⏸️"  
+    # else :
+    #     st.play_pause_button_text = "▶️"
     play_pause_button = button_col.button(st.play_pause_button_text)
-    with speed_slider:
-        st.markdown('<p class="sidebar-title">Speed</p>', unsafe_allow_html=True)
-    speed = speed_slider.slider('', min_value=1, max_value=50, value=25, step=1)
+    
+    speed = st.sidebar.slider('Speed', min_value=1, max_value=50, value=25, step=1)
 
     if play_pause_button:
-        st.session_state.is_playing = not is_playing
+        #st.play_pause_button_text = "⏸️" if not is_playing else "▶️"
+        # if is_playing:
+        #     st.play_pause_button_text = "⏸️"  
+           
+        # else :
+        #     st.play_pause_button_text = "▶️"
             
+        st.session_state.is_playing = not is_playing
+    # play_pause_button = button_col.button(st.play_pause_button_text)
     if st.session_state.is_playing:
         i = st.session_state.current_state
         while i < num_of_element - size:
@@ -391,19 +411,14 @@ def plotRep(df, size, start, num_of_element, line_plot):
             st.session_state.current_state = i
         if st.session_state.size1 == num_of_element - 1:
             st.session_state.is_playing = False
+            step_df = df.iloc[0:num_of_element]
+            lines = plot_animation(step_df)
+            line_plot.altair_chart(lines)
             st.session_state.current_state = start
             st.session_state.step_df = df.iloc[start : start + size]
     else:
-        # plot the signal up to the current state or reset if a new file has been selected
-        if st.session_state.selected_file != st.session_state.prev_file:
-            st.session_state.current_state = start
-            st.session_state.selected_file = st.session_state.prev_file
-        step_df = df.iloc[start : start + num_of_element]
-        st.session_state.step_df = step_df
-        lines = plot_animation(step_df)
-        line_plot.altair_chart(lines)
-        st.session_state.prev_file = st.session_state.selected_file
-        st.session_state.prev_df = df.copy()
+        lines = plot_animation(st.session_state.step_df)
+        return line_plot.altair_chart(lines)
 
     return line_plot
 
