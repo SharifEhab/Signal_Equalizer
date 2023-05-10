@@ -101,8 +101,8 @@ if file:
             
                 
             # create a dictionary containing the frequency ranges for various types of biological signal abnormalities
-            dictnoary_values = {"Mitral Stenosis":[10,300]
-                                    }
+            dictnoary_values = {"Mitral Stenosis":[95,300]
+                                }
             values_slider = [[0, 10, 1]] * len(list(dictnoary_values.keys()))
             #Data_frame_of_medical = pd.read_csv(file)
                 
@@ -112,3 +112,5 @@ if file:
           
         Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
                               sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values,file)
+        
+        

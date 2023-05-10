@@ -181,7 +181,7 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     #         all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
     
     all_sliders_values = generate_vertical_sliders(slider_labels,sliders_values)  #Selected values for each slider in an array
-    
+   
     magnitude_signal_frequency,frequency_components = Fourier_Transform_Signal(magnitude_signal_time,sampling_rate)
     
     magnitude_frequency_modified = General_Signal_Equalization(slider_labels,magnitude_signal_frequency,frequency_components,all_sliders_values,dict_freq_ranges)
@@ -244,19 +244,17 @@ def modified_audio(magnitude_time_modified,sample_rate) :
 
 def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     """
-    Function to apply changes to a medical instrument signal.
+    Function to plot  to a  power spectrum of medical signal.
 
     Parameters
     ----------
-    Ecg_file       : wav file of ECG (PCG)
-        ECG file in wav format.
-    sliders_value  : list of float
-        Values to be multiplied with the frequency components.
+    Mag-freq_mod       :Magnitude of frequency components of input signal
+    freq_comp  :  Frequencies that make up the medical signal (Mitral Stenosis)
 
     Returns
     -------
-    time_domain_amplitude : numpy array
-        Time domain amplitude after applying changes.
+    power of signal at different frequencies : numpy array
+    Function relates to magnitude of frequency spectrum
     """
     
     #time_plot_col = st.columns(2)
@@ -266,7 +264,7 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     fig1.update_layout(height=288)      
     # Set x axis label
     fig1.update_xaxes(
-        title_text="Time", 
+        title_text="Frequency", 
         title_font={"size": 20},
         title_standoff=25,
         range = [0,500]
@@ -274,7 +272,7 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     
     # Set y axis label
     fig1.update_yaxes(
-        title_text="Amplitude (mv)",
+        title_text="Power",
         title_font={"size": 20},
         title_standoff=25
     )
@@ -285,7 +283,7 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate):
     #time = np.arange(0,len(amplitude))/samplingrate
     fig1.add_scatter(x=freq_axis, y=power_spectrum)
     st.plotly_chart(fig1, use_container_width=True)
-
+     
     return power_spectrum
 
 #____ Animation Function_____#
