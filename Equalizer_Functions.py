@@ -19,7 +19,7 @@ import scipy.io.wavfile as wav
 
 #____End of functions/ variables for synthetic signal generation__________# 
 
-def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=1):
+def generate_vertical_sliders(array_slider_labels, array_slider_values,Slider_step=0.1):
     """
     Generate vertical sliders for different equalizer modes
     Parameters
@@ -190,16 +190,16 @@ def processing_signal(selected_mode,slider_labels,sliders_values,magnitude_signa
     # original_audio(file)
     # modified_audio(magnitude_time_modified,sampling_rate)
     if selected_mode == 'Biological Signal Abnormalities' :
-        file_path_normal = r'C:\Users\shiro\OneDrive\Desktop\DSP_Tasks\Task_3\Signal_Equalizer\Normal_Heart.wav'
-        samples_normal, normal_sampling_rate = load_audio_file(file_path_normal)
-        magnitude_freq_normal, freq_normal = Fourier_Transform_Signal(samples_normal,normal_sampling_rate )
+       # file_path_normal = r'C:\Users\shiro\OneDrive\Desktop\DSP_Tasks\Task_3\Signal_Equalizer\Normal_Heart.wav'
+        #samples_normal, normal_sampling_rate = load_audio_file(file_path_normal)
+       # magnitude_freq_normal, freq_normal = Fourier_Transform_Signal(samples_normal,normal_sampling_rate )
 
 
         with col_medical_1:
-            modifiy_medical_signal(magnitude_frequency_modified,frequency_components,sampling_rate,"Aortic Stenosis")  # Power spectral density of abnormality 
+            modifiy_medical_signal(magnitude_frequency_modified,frequency_components,sampling_rate,"Presistent_Split_S2")  # Power spectral density of abnormality 
         
-        with col_medical_2:
-            modifiy_medical_signal(magnitude_freq_normal,freq_normal,normal_sampling_rate,"Normal") # Power spectral density of normal heart sound
+        #with col_medical_2:
+         #   modifiy_medical_signal(magnitude_freq_normal,freq_normal,normal_sampling_rate,"Normal") # Power spectral density of normal heart sound
    
             
           
@@ -293,13 +293,24 @@ def modifiy_medical_signal( mag_freq_mod,freq_comp,samplingrate,title):
     )
     
     power_spectrum = np.abs(mag_freq_mod)**2 
+    normalized_power_spectrum = power_spectrum/ np.max(power_spectrum)
     
-    freq_axis = np.linspace(0,samplingrate/2,len(power_spectrum))
+    freq_axis = np.linspace(0,samplingrate/2,len(normalized_power_spectrum))
     #time = np.arange(0,len(amplitude))/samplingrate
-    fig1.add_scatter(x=freq_axis, y=power_spectrum)
-    st.plotly_chart(fig1, width='10')
+    fig1.add_scatter(x=freq_axis, y=normalized_power_spectrum)
+    st.plotly_chart(fig1, width='45%',height =300)
      
-    return power_spectrum
+    return normalized_power_spectrum
+
+def applying_hanning_window(magnitude_time_signal):
+    """
+    Apply hanning window to medical signal before applying the fourier transform in order to 
+    smooth the edges and reduce spectral leakage
+    """
+    
+    windowed_signal = magnitude_time_signal * np.hanning(len(magnitude_time_signal))
+    
+    return windowed_signal
 
 #____ Animation Function_____#
 
@@ -508,3 +519,7 @@ def Spectogram(y, title_of_graph):
     
     # Display the plot in Streamlit
     st.pyplot(fig)
+    
+    
+    
+    
