@@ -99,18 +99,54 @@ if file:
          
         elif Mode == 'Biological Signal Abnormalities':
             
-                
-            # create a dictionary containing the frequency ranges for various types of biological signal abnormalities
-            dictnoary_values = {"Aoartic Stenosis":[85,500]
+            """"    
+            create a dictionary containing the frequency ranges for various types of biological signal abnormalities
+            dictnoary_values = { 
+                                "Aoartic Stenosis_1_Zero":[40,50],
+                                "Aoartic Stenosis_2_Zero":[85,500],
+                                 "Aoartic Stenosis_Domin":[62,63],
+                                  "Aoartic Stenosis_Domin_2":[66,69],
+                                "Aoartic Stenosis_NormalDomin":[66,67]
+                              
+                                
                                 }
-            values_slider = [[0.2, 10, 1]] * len(list(dictnoary_values.keys()))
+            """
+            
+            """
+              create a dictionary containing the frequency ranges for various types of biological signal abnormalities
+            dictnoary_values = { 
+                                "Mitral_Stenosis_1" :[100,300],
+                                "Mitral_Stenosis_2": [81,90],
+                                 "Mitral_Stenosis_3": [65,66],
+                              
+                                
+                                }
+            """
+            dictnoary_values = { 
+                                "Presistent_split_S2_low":[100,215],
+                                 "Presistent_split_S2_2_high":[84,85],
+                                   "Presistent_split_S2_3_low":[78,80],
+                                    "Presistent_split_S2_4_high":[60,75],
+                                    "Presistent_split_S2_5_high":[81,82],
+                                    "Presistent_split_S2_6_high":[87,88],
+                                    "Presistent_split_S2_7_high":[90,91],
+                                    "Presistent_split_S2_8_low":[215,233],
+                                     "Presistent_split_S2_9_low":[235,250],
+                                    "Presistent_split_S2_10_low":[250,500],
+
+                               # "Presistent_split_S2":[200,300],
+                                # "Presistent_split_S2_2":[78,81],
+                                 #"Dominant_Normal" :[65,66]
+                                
+                                }
+            values_slider = [[0, 10, 1]] * len(list(dictnoary_values.keys()))
             #Data_frame_of_medical = pd.read_csv(file)
                 
          #   slider = Equalizer_Functions.generate_vertical_sliders(
         #            list(dictnoary_values.keys()), values_slider, 0.1)
           #  Equalizer_Functions.modifiy_medical_signal( Mode,magnitude_at_time,sample_rate,st.session_state['Spectogram_Graph'],dictnoary_values,list(dictnoary_values.keys()),values_slider) 
-          
-        Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, magnitude_at_time,
+        windowed_smoothed_signal = Equalizer_Functions.applying_hanning_window(magnitude_at_time)  
+        Equalizer_Functions.processing_signal(Mode, list(dictnoary_values.keys()), values_slider, windowed_smoothed_signal,
                               sample_rate, st.session_state['Spectogram_Graph'], dictnoary_values,file)
         
         
